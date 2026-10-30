@@ -1,24 +1,54 @@
 <!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#080d17"><meta name="description" content="ZYRON — Beyond the Game. Local testing and file workspace.">
-  <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css">
-  <title>ZYRON — Beyond the Game</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070b12"><meta name="description" content="ZYRON — Beyond the Game. Your private testing and data workspace.">
+<link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg"><link rel="stylesheet" href="./styles.css">
+<title>ZYRON — Beyond the Game</title>
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar"><a class="brand" href="#" aria-label="ZYRON home"><span class="brand-mark">Z</span><span>ZYRON<small>BEYOND THE GAME</small></span></a><span class="platform" id="platform">WEB WORKSPACE</span></header>
-    <main>
-      <section class="hero"><div><p class="eyebrow">PRIVATE TEST WORKSPACE</p><h1>Control your<br><span>own test data.</span></h1><p class="sub">A focused toolkit for files and data you own or are authorized to test.</p></div><div class="hero-orb" aria-hidden="true">Z</div></section>
-      <div class="status" id="status" role="status">Local workspace ready</div>
-      <nav class="tabs" aria-label="Workspace sections"><button class="tab active" data-tab="overview">Overview</button><button class="tab" data-tab="lab">Test Lab</button><button class="tab" data-tab="files">File Lab</button><button class="tab" data-tab="diagnostics">Diagnostics</button></nav>
-      <section class="panel view active" id="overview"><div class="section-head"><div><p class="eyebrow">YOUR WORKSPACE</p><h2>Overview</h2></div><span class="live-dot">LOCAL</span></div><div class="stats"><article class="stat"><span>TEST VALUES</span><strong id="overview-count">0</strong></article><article class="stat"><span>SAVED PROFILES</span><strong id="profile-count">0</strong></article><article class="stat"><span>RECENT EVENTS</span><strong id="event-count">0</strong></article></div><div class="actions"><button class="primary" data-go="lab">Open Test Lab <span>↗</span></button><button class="secondary" data-go="files">Open File Lab <span>↗</span></button></div><div class="card"><h3>Profiles</h3><div class="inline"><input id="profile-name" placeholder="Profile name" maxlength="40"><button class="secondary" id="save-profile">Save</button></div><div id="profiles" class="profile-list"></div></div><p class="fine">ZYRON works with local sample data and files you explicitly choose. It does not access other apps' private data or modify third-party games.</p></section>
-      <section class="panel view" id="lab"><div class="section-head"><div><p class="eyebrow">LOCAL VALUE LAB</p><h2>Test Lab</h2></div><span class="live-dot">ON DEVICE</span></div><form id="add-form" class="add-grid"><input id="new-key" placeholder="Value name" maxlength="60" required><input id="new-value" placeholder="Value (number or text)" maxlength="200" required><button class="primary" type="submit">Add value</button></form><div class="toolbar"><input id="search" placeholder="Search by name or value"><select id="filter"><option>All</option><option>Exact</option><option>Numbers</option><option>Integer</option><option>Decimal</option><option>Text</option></select></div><div class="toolbar range"><input id="min" type="number" step="any" placeholder="Minimum"><input id="max" type="number" step="any" placeholder="Maximum"><button class="secondary" id="export">Export JSON</button></div><p class="result-count" id="result-count">0 matches · 0 total</p><div id="values" class="value-list"></div></section>
-      <section class="panel view" id="files"><div class="section-head"><div><p class="eyebrow">DOCUMENT WORKSPACE</p><h2>File Lab</h2></div><span class="live-dot">USER SELECTED</span></div><p class="sub">Choose a text, JSON or XML document. ZYRON only reads the file you select.</p><div class="file-actions"><label class="primary file-pick">Choose file<input id="file-input" type="file" accept=".txt,.json,.xml,text/plain,application/json,application/xml"></label><button class="secondary" id="import" disabled>Import JSON</button></div><p id="file-name" class="file-name">No file selected</p><pre id="preview" class="preview">Selected document preview appears here (up to 12 KB).</pre></section>
-      <section class="panel view" id="diagnostics"><div class="section-head"><div><p class="eyebrow">SYSTEM STATUS</p><h2>Diagnostics</h2></div><span class="live-dot">READY</span></div><div id="diagnostic-rows" class="diagnostics"></div><h3 class="subhead">Activity history</h3><div id="history" class="history"></div></section>
-    </main>
-    <footer>ZYRON <span>•</span> Beyond the Game <span>•</span> Local-first workspace</footer>
-  </div>
-  <script src="./app.js" defer></script>
+<div class="app-shell">
+<aside class="sidebar">
+<a class="brand" href="#"><span class="brand-symbol">Z</span><span class="brand-word">ZYRON<small>BEYOND THE GAME</small></span></a>
+<div class="side-label">WORKSPACE</div>
+<nav class="side-nav" aria-label="Workspace">
+<button class="nav-item active" data-tab="overview"><i>⌂</i> Overview <b>01</b></button>
+<button class="nav-item" data-tab="lab"><i>⌘</i> Test Lab <b>02</b></button>
+<button class="nav-item" data-tab="files"><i>▤</i> File Lab <b>03</b></button>
+<button class="nav-item" data-tab="diagnostics"><i>⌁</i> Diagnostics <b>04</b></button>
+</nav>
+<div class="sidebar-bottom"><div class="secure-mark">◆ <span>LOCAL-FIRST ENVIRONMENT</span></div><p>Your workspace. Your data.<br>Stored on this device.</p><div class="version">ZYRON WEB <span>v1.2</span></div></div>
+</aside>
+<main class="main-area">
+<header class="topbar"><div class="breadcrumb">ZYRON <span>/</span> <strong id="crumb">Overview</strong></div><div class="top-actions"><span class="connection"><i></i> LOCAL SESSION</span><div class="avatar">Z</div></div></header>
+<div class="content">
+<section class="hero-banner">
+<div class="hero-copy"><div class="eyebrow"><span></span> YOUR PRIVATE DIGITAL WORKSPACE</div><h1>Beyond the<br><em>Game.</em></h1><p>Powerful tools. Clear insights. Complete control over your own test environment.</p><div class="hero-buttons"><button class="btn-primary" data-go="lab">Enter Test Lab <span>↗</span></button><button class="btn-ghost" data-go="files">Explore File Lab</button></div></div>
+<div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit-core">Z<span></span></div><div class="art-caption">SYSTEM<br><b>READY_</b></div></div>
+<div class="hero-index">01 <span>— 04</span></div>
+</section>
+<div class="section-heading"><div><div class="eyebrow">COMMAND CENTER</div><h2>Your workspace at a glance</h2></div><span class="live-pill"><i></i> ALL SYSTEMS LOCAL</span></div>
+<section class="view active" id="overview">
+<div class="metric-grid">
+<article class="metric-card"><div class="metric-top"><span>TEST VALUES</span><b>⌘</b></div><strong id="overview-count">0</strong><small>Saved in this workspace</small><div class="metric-line"></div></article>
+<article class="metric-card"><div class="metric-top"><span>SAVED PROFILES</span><b>▣</b></div><strong id="profile-count">0</strong><small>Your reusable configurations</small><div class="metric-line"></div></article>
+<article class="metric-card"><div class="metric-top"><span>RECENT EVENTS</span><b>⌁</b></div><strong id="event-count">0</strong><small>Latest workspace activity</small><div class="metric-line"></div></article>
+</div>
+<div class="feature-grid">
+<article class="feature-card feature-main"><div class="feature-icon">⌘</div><div class="feature-tag">01 / DATA WORKSPACE</div><h3>Test Lab</h3><p>Create, inspect, search, filter and manage your own local test values with a focused toolkit.</p><button class="text-link" data-go="lab">OPEN TEST LAB <span>↗</span></button><div class="feature-watermark">Z</div></article>
+<article class="feature-card"><div class="feature-icon">▤</div><div class="feature-tag">02 / DOCUMENT TOOLS</div><h3>File Lab</h3><p>Preview selected documents and import structured JSON data.</p><button class="text-link" data-go="files">OPEN FILE LAB <span>↗</span></button></article>
+<article class="feature-card"><div class="feature-icon">⌁</div><div class="feature-tag">03 / SYSTEM INSIGHTS</div><h3>Diagnostics</h3><p>Review your device environment and recent workspace activity.</p><button class="text-link" data-go="diagnostics">VIEW DIAGNOSTICS <span>↗</span></button></article>
+</div>
+<div class="lower-grid"><article class="surface-card"><div class="card-heading"><div><div class="eyebrow">CONFIGURATION</div><h3>Saved profiles</h3></div><span class="subtle-count" id="profile-count-label">0 PROFILES</span></div><div class="profile-create"><input id="profile-name" placeholder="Name this profile" maxlength="40"><button class="btn-primary compact" id="save-profile">Save profile <span>＋</span></button></div><div id="profiles" class="profile-list"></div></article><article class="surface-card privacy-card"><div class="privacy-icon">◇</div><div class="eyebrow">BUILT AROUND PRIVACY</div><h3>Your data stays yours.</h3><p>ZYRON stores workspace data locally in your browser or app. Files are opened only when you choose them.</p><span class="privacy-foot">LOCAL STORAGE <b>● ACTIVE</b></span></article></div>
+<p class="disclaimer">ZYRON is intended for local sample data and software or files you own or are authorized to test. It does not access other apps' private data or modify third-party games.</p>
+</section>
+<section class="view workspace-view" id="lab"><div class="page-title"><div class="eyebrow">DATA WORKSPACE / 01</div><h2>Test Lab<span class="title-dot">.</span></h2><p>Manage and inspect values created inside your ZYRON workspace.</p></div><div class="lab-toolbar"><div class="search-wrap"><span>⌕</span><input id="search" placeholder="Search values by name or content"></div><select id="filter"><option>All</option><option>Exact</option><option>Numbers</option><option>Integer</option><option>Decimal</option><option>Text</option></select></div><form id="add-form" class="add-panel"><div><div class="eyebrow">CREATE ENTRY</div><h3>Add a test value</h3></div><input id="new-key" placeholder="Value name" maxlength="60" required><input id="new-value" placeholder="Value (number or text)" maxlength="200" required><button class="btn-primary" type="submit">Add value <span>＋</span></button></form><div class="range-toolbar"><div class="range-label">NUMERIC RANGE <span>Optional</span></div><input id="min" type="number" step="any" placeholder="Minimum"><input id="max" type="number" step="any" placeholder="Maximum"><button class="btn-ghost" id="export">↓ Export JSON</button></div><div class="list-heading"><h3>Your values</h3><span id="result-count">0 matches · 0 total</span></div><div id="values" class="value-list"></div></section>
+<section class="view workspace-view" id="files"><div class="page-title"><div class="eyebrow">DOCUMENT TOOLS / 02</div><h2>File Lab<span class="title-dot">.</span></h2><p>Inspect documents you explicitly select. Supported formats: TXT, JSON and XML.</p></div><div class="file-drop"><div class="file-glyph">▤</div><h3>Bring a document into your workspace</h3><p>Select a file from your device to preview it securely.</p><div class="file-actions"><label class="btn-primary file-pick">Choose a file <span>↗</span><input id="file-input" type="file" accept=".txt,.json,.xml,text/plain,application/json,application/xml"></label><button class="btn-ghost" id="import" disabled>Import JSON</button></div><p id="file-name" class="file-name">No file selected</p></div><div class="preview-card"><div class="preview-head"><span>DOCUMENT PREVIEW</span><span>MAX 12 KB DISPLAY</span></div><pre id="preview" class="preview">Your selected document preview will appear here.</pre></div></section>
+<section class="view workspace-view" id="diagnostics"><div class="page-title"><div class="eyebrow">SYSTEM INSIGHTS / 03</div><h2>Diagnostics<span class="title-dot">.</span></h2><p>A transparent overview of this browser or device session.</p></div><div class="diagnostic-banner"><span class="diagnostic-pulse"></span><div><b>Workspace operational</b><small>Local tools are ready for use.</small></div><span class="live-pill">LOCAL</span></div><div id="diagnostic-rows" class="diagnostics"></div><div class="history-card"><div class="card-heading"><div><div class="eyebrow">SESSION LOG</div><h3>Activity history</h3></div></div><div id="history" class="history"></div></div></section>
+<footer><span>© ZYRON</span><span>BEYOND THE GAME</span><span>LOCAL-FIRST WORKSPACE</span></footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script src="./app.js" defer></script>
 </body></html>
