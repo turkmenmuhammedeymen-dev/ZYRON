@@ -1,13 +1,6 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false,
-  "redirects": [
-    {
-      "source": "/web",
-      "destination": "/web/",
-      "permanent": true
-    }
-  ],
+  "trailingSlash": true,
   "rewrites": [
     {
       "source": "/",
