@@ -1,6 +1,5 @@
 package com.zyron.lab
 
-import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -8,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -47,7 +45,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun ZyronApp() {
     val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences("zyron_local_lab", ComponentActivity.MODE_PRIVATE) }
+    val prefs = remember { context.getSharedPreferences("zyron_local_lab", android.content.Context.MODE_PRIVATE) }
     val entries = remember { mutableStateListOf<TestValue>() }
     var selectedTab by remember { mutableStateOf("Overview") }
     var search by remember { mutableStateOf("") }
@@ -60,6 +58,12 @@ private fun ZyronApp() {
     var filePreview by remember { mutableStateOf("") }
     var status by remember { mutableStateOf("Local workspace ready") }
     var history by remember { mutableStateOf(listOf<String>()) }
+    var profileName by remember { mutableStateOf("") }
+    var profiles by remember { mutableStateOf(listOf<String>()) }
+    var showSaveProfile by remember { mutableStateOf(false) }
+    var showLoadProfile by remember { mutableStateOf(false) }
+    var minNumber by remember { mutableStateOf("") }
+    var maxNumber by remember { mutableStateOf("") }
 
     fun log(message: String) {
         history = (listOf("${System.currentTimeMillis()} • $message") + history).take(60)
@@ -72,6 +76,46 @@ private fun ZyronApp() {
             array.put(JSONObject().put("id", item.id).put("key", item.key).put("value", item.value).put("type", item.type))
         }
         prefs.edit().putString("values", array.toString()).apply()
+    }
+    fun saveProfile(name: String) {
+        val clean = name.trim()
+        if (clean.isBlank()) { status = "Profile name is required"; return }
+        val all = runCatching { JSONObject(prefs.getString("profiles", "{}") ?: "{}") }.getOrElse { JSONObject() }
+        val snapshot = JSONArray()
+        entries.forEach { snapshot.put(JSONObject().put("id", it.id).put("key", it.key).put("value", it.value).put("type", it.type)) }
+        all.put(clean, snapshot)
+        prefs.edit().putString("profiles", all.toString()).apply()
+        profiles = (0 until all.length()).map { all.names()?.optString(it) ?: "" }.filter { it.isNotBlank() }
+        log("Saved profile: $clean")
+    }
+    fun loadProfile(name: String) {
+        runCatching {
+            val all = JSONObject(prefs.getString("profiles", "{}") ?: "{}")
+            val snapshot = all.getJSONArray(name)
+            val loaded = mutableListOf<TestValue>()
+            for (i in 0 until snapshot.length()) {
+                val o = snapshot.getJSONObject(i)
+                loaded.add(TestValue(o.optLong("id", System.currentTimeMillis() + i), o.getString("key"), o.getString("value"), o.optString("type", "TEXT")))
+            }
+            entries.clear(); entries.addAll(loaded); persist(); log("Loaded profile: $name")
+        }.onFailure { status = "Could not load profile: ${it.message ?: "invalid profile"}" }
+    }
+    fun importJson(raw: String) {
+        runCatching {
+            val array = JSONArray(raw)
+            val incoming = mutableListOf<TestValue>()
+            for (i in 0 until array.length()) {
+                val o = array.getJSONObject(i)
+                val key = o.optString("key").trim()
+                val value = o.optString("value")
+                require(key.isNotBlank() && value.isNotBlank()) { "Each entry needs key and value" }
+                val type = if (value.toLongOrNull() != null) "INTEGER" else if (value.toDoubleOrNull() != null) "DECIMAL" else "TEXT"
+                incoming.add(TestValue(System.currentTimeMillis() + i, key, value, type))
+            }
+            require(incoming.isNotEmpty()) { "No values found" }
+            val merged = (incoming + entries).distinctBy { it.key.lowercase() }
+            entries.clear(); entries.addAll(merged); persist(); log("Imported ${incoming.size} JSON values")
+        }.onFailure { status = "JSON import failed: ${it.message ?: "invalid JSON"}" }
     }
     fun addValue(key: String, value: String) {
         if (key.isBlank() || value.isBlank()) {
@@ -98,6 +142,8 @@ private fun ZyronApp() {
             }
         }
         history = prefs.getString("history", "")?.lines()?.filter { it.isNotBlank() } ?: emptyList()
+        val savedProfiles = runCatching { JSONObject(prefs.getString("profiles", "{}") ?: "{}") }.getOrElse { JSONObject() }
+        profiles = (0 until savedProfiles.length()).map { savedProfiles.names()?.optString(it) ?: "" }.filter { it.isNotBlank() }
         if (entries.isEmpty()) {
             entries.addAll(listOf(
                 TestValue(1, "coins_demo", "12500", "INTEGER"),
@@ -163,18 +209,27 @@ private fun ZyronApp() {
                         OutlinedTextField(search, { search = it }, Modifier.fillMaxWidth(), label = { Text("Search by name or value") }, singleLine = true)
                         Spacer(Modifier.height(6.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            listOf("All", "Exact", "Numbers", "Text").forEach { option ->
+                            listOf("All", "Exact", "Numbers", "Integer", "Decimal", "Text").forEach { option ->
                                 FilterChip(selected = filter == option, onClick = { filter = option }, label = { Text(option) })
                             }
                         }
                         val visible = entries.filter { item ->
                             val matches = search.isBlank() || item.key.contains(search, true) || item.value.contains(search, true)
-                            matches && when (filter) {
-                                "Exact" -> item.value == search
+                            val numeric = item.value.toDoubleOrNull()
+                            val rangeMatches = (minNumber.isBlank() || (numeric != null && numeric >= (minNumber.toDoubleOrNull() ?: Double.NEGATIVE_INFINITY))) &&
+                                (maxNumber.isBlank() || (numeric != null && numeric <= (maxNumber.toDoubleOrNull() ?: Double.POSITIVE_INFINITY)))
+                            matches && rangeMatches && when (filter) {
+                                "Exact" -> search.isNotBlank() && item.value.equals(search, true)
                                 "Numbers" -> item.type == "INTEGER" || item.type == "DECIMAL"
                                 "Text" -> item.type == "TEXT"
+                                "Integer" -> item.type == "INTEGER"
+                                "Decimal" -> item.type == "DECIMAL"
                                 else -> true
                             }
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedTextField(minNumber, { minNumber = it }, Modifier.weight(1f), label = { Text("Min") }, singleLine = true)
+                            OutlinedTextField(maxNumber, { maxNumber = it }, Modifier.weight(1f), label = { Text("Max") }, singleLine = true)
                         }
                         Spacer(Modifier.height(8.dp))
                         Text("${visible.size} MATCHES  •  ${entries.size} TOTAL", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold)
@@ -193,7 +248,10 @@ private fun ZyronApp() {
                         Text("FILE INSPECTOR", color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                         Text("Only documents you explicitly select are opened. ZYRON does not browse other apps' private files.", color = Muted, fontSize = 12.sp)
                         Spacer(Modifier.height(14.dp))
-                        Button(onClick = { openFile.launch(arrayOf("text/*", "application/json", "application/xml")) }) { Text("Choose a text / JSON file") }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(onClick = { openFile.launch(arrayOf("text/*", "application/json", "application/xml")) }) { Text("Choose file") }
+                            OutlinedButton(onClick = { importJson(filePreview) }, enabled = filePreview.isNotBlank()) { Text("Import JSON") }
+                        }
                         Text(fileName, color = Color.White, fontWeight = FontWeight.SemiBold)
                         Spacer(Modifier.height(8.dp))
                         Surface(color = Panel, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().weight(1f, fill = false)) {
@@ -221,6 +279,11 @@ private fun ZyronApp() {
                         InfoRow("Local test values", entries.size.toString())
                         InfoRow("History events", history.size.toString())
                         InfoRow("Storage", "On-device preferences")
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(onClick = { showSaveProfile = true }) { Text("Save profile") }
+                            OutlinedButton(onClick = { showLoadProfile = true }, enabled = profiles.isNotEmpty()) { Text("Load profile") }
+                        }
+                        Text("Saved profiles: ${profiles.size}", color = Muted, fontSize = 11.sp)
                         Spacer(Modifier.height(12.dp))
                         listOf("Test Lab" to "Add, search, filter, edit and adjust local sample values.", "File Lab" to "Open and preview documents you choose.", "Diagnostics" to "View device information and app activity.").forEach { (title, desc) ->
                             Surface(color = Panel, shape = RoundedCornerShape(15.dp), modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
@@ -236,6 +299,19 @@ private fun ZyronApp() {
             }
         }
     }
+    if (showSaveProfile) AlertDialog(
+        onDismissRequest = { showSaveProfile = false },
+        title = { Text("Save test profile") },
+        text = { OutlinedTextField(profileName, { profileName = it }, label = { Text("Profile name") }, singleLine = true) },
+        confirmButton = { TextButton(onClick = { saveProfile(profileName); profileName = ""; showSaveProfile = false }) { Text("Save") } },
+        dismissButton = { TextButton(onClick = { showSaveProfile = false }) { Text("Cancel") } }
+    )
+    if (showLoadProfile) AlertDialog(
+        onDismissRequest = { showLoadProfile = false },
+        title = { Text("Load test profile") },
+        text = { Column { profiles.forEach { name -> TextButton(onClick = { loadProfile(name); showLoadProfile = false }) { Text(name) } } } },
+        confirmButton = { TextButton(onClick = { showLoadProfile = false }) { Text("Close") } }
+    )
     editing?.let { item ->
         AlertDialog(
             onDismissRequest = { editing = null },
