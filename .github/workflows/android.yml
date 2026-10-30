@@ -1,11 +1,25 @@
-name: Android CI
+name: ZYRON Web + Android CI
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 jobs:
-  build:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate web assets
+        run: |
+          test -s web/index.html
+          test -s web/app.js
+          test -s web/styles.css
+          node --check web/app.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zyron-web
+          path: web/
+  android:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,9 +30,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Build debug APK
+      - name: Build Android APK (bundles the same web app)
         run: gradle assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: zyron-debug-apk
+          name: zyron-android-apk
           path: app/build/outputs/apk/debug/app-debug.apk
