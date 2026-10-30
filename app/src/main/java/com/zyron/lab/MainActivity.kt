@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.webkit.ValueCallback
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
@@ -18,12 +20,20 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         webView = WebView(this).apply {
-            settings.javaScriptEnabled = true
-            settings.domStorageEnabled = true
-            settings.allowFileAccess = true
-            settings.allowContentAccess = false
-            settings.javaScriptCanOpenWindowsAutomatically = false
-            settings.setSupportMultipleWindows(false)
+            setBackgroundColor(android.graphics.Color.rgb(7, 11, 18))
+            settings.apply {
+                javaScriptEnabled = true
+                domStorageEnabled = true
+                allowFileAccess = true
+                // Required for the user-selected ACTION_OPEN_DOCUMENT content URI.
+                allowContentAccess = true
+                javaScriptCanOpenWindowsAutomatically = false
+                setSupportMultipleWindows(false)
+                mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) safeBrowsingEnabled = true
+                allowFileAccessFromFileURLs = false
+                allowUniversalAccessFromFileURLs = false
+            }
             webViewClient = WebViewClient()
             webChromeClient = object : WebChromeClient() {
                 override fun onShowFileChooser(
@@ -32,9 +42,9 @@ class MainActivity : Activity() {
                     params: FileChooserParams?
                 ): Boolean {
                     fileChooserCallback?.onReceiveValue(null)
-                    fileChooserCallback = callback
+                    fileChooserCallback = callback ?: return false
                     return try {
-                        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                        val intent = params?.createIntent() ?: Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                             addCategory(Intent.CATEGORY_OPENABLE)
                             type = "*/*"
                         }
@@ -55,28 +65,25 @@ class MainActivity : Activity() {
     @Deprecated("Deprecated in Android, retained for broad device compatibility")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == FILE_CHOOSER_REQUEST) {
-            val result = if (resultCode == RESULT_OK && data?.data != null) {
-                arrayOf(data.data!!)
-            } else null
-            fileChooserCallback?.onReceiveValue(result)
-            fileChooserCallback = null
-        }
+        if (requestCode != FILE_CHOOSER_REQUEST) return
+        val result = if (resultCode == RESULT_OK && data?.data != null) arrayOf(data.data!!) else null
+        fileChooserCallback?.onReceiveValue(result)
+        fileChooserCallback = null
     }
 
     @Deprecated("Deprecated in Android, retained for broad device compatibility")
     override fun onBackPressed() {
-        if (::webView.isInitialized && webView.canGoBack()) {
-            webView.goBack()
-        } else {
-            super.onBackPressed()
-        }
+        if (::webView.isInitialized && webView.canGoBack()) webView.goBack() else super.onBackPressed()
     }
 
     override fun onDestroy() {
         fileChooserCallback?.onReceiveValue(null)
         fileChooserCallback = null
-        if (::webView.isInitialized) webView.destroy()
+        if (::webView.isInitialized) {
+            webView.stopLoading()
+            webView.loadUrl("about:blank")
+            webView.destroy()
+        }
         super.onDestroy()
     }
 
