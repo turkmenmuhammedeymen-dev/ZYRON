@@ -6,5 +6,26 @@
       "source": "/",
       "destination": "/web/"
     }
+  ],
+  "headers": [
+    {
+      "source": "/web/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" },
+        { "key": "Service-Worker-Allowed", "value": "/web/" }
+      ]
+    },
+    {
+      "source": "/web/index.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/web/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
+      ]
+    }
   ]
 }
