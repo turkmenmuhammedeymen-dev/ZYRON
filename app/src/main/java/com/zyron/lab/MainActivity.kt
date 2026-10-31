@@ -8,12 +8,14 @@ import android.os.Build
 import android.os.Bundle
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
+    private var memoryBridge: MemoryBridge? = null
     private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -34,7 +36,17 @@ class MainActivity : Activity() {
                 allowFileAccessFromFileURLs = false
                 allowUniversalAccessFromFileURLs = false
             }
-            webViewClient = WebViewClient()
+            // Memory Lab köprüsü root yetkili çekirdeğe konuşur; bu yüzden WebView yalnızca
+            // paketlenmiş yerel sayfayı gösterir, dış adreslere gitmesine izin verilmez.
+            webViewClient = object : WebViewClient() {
+                private fun isLocal(url: String?) = url != null && url.startsWith(LOCAL_ROOT)
+
+                @Deprecated("Needed for API 23")
+                override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean = !isLocal(url)
+
+                override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean =
+                    !isLocal(request?.url?.toString())
+            }
             webChromeClient = object : WebChromeClient() {
                 override fun onShowFileChooser(
                     view: WebView?,
@@ -57,8 +69,9 @@ class MainActivity : Activity() {
                     }
                 }
             }
-            loadUrl("file:///android_asset/www/index.html")
         }
+        memoryBridge = MemoryBridge(this, webView).also { webView.addJavascriptInterface(it, "ZyronMem") }
+        webView.loadUrl(LOCAL_ROOT + "index.html")
         setContentView(webView)
     }
 
@@ -79,6 +92,8 @@ class MainActivity : Activity() {
     override fun onDestroy() {
         fileChooserCallback?.onReceiveValue(null)
         fileChooserCallback = null
+        memoryBridge?.shutdown()
+        memoryBridge = null
         if (::webView.isInitialized) {
             webView.stopLoading()
             webView.loadUrl("about:blank")
@@ -89,5 +104,6 @@ class MainActivity : Activity() {
 
     private companion object {
         const val FILE_CHOOSER_REQUEST = 7301
+        const val LOCAL_ROOT = "file:///android_asset/www/"
     }
 }

@@ -14,11 +14,21 @@ jobs:
           test -s web/index.html
           test -s web/app.js
           test -s web/styles.css
+          test -s web/memlab.js
           node --check web/app.js
+          node --check web/memlab.js
       - uses: actions/upload-artifact@v4
         with:
           name: zyron-web
           path: web/
+  native-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Memory Lab core tests (scan / narrow / write / freeze / safety limits)
+        run: sudo python3 native/test_memcore.py
+      - name: Memory Lab UI end-to-end test (headless Chrome + real core)
+        run: sudo python3 native/test_ui.py
   android:
     runs-on: ubuntu-latest
     steps:
@@ -30,6 +40,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Build Memory Lab native core with the Android NDK
+        run: bash native/build-android.sh
       - name: Build Android APK (bundles the same web app)
         run: gradle assembleDebug
       - uses: actions/upload-artifact@v4

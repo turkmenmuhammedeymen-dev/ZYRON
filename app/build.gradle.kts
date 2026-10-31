@@ -9,8 +9,13 @@ android {
         applicationId = "com.zyron.lab"
         minSdk = 23
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
+    }
+    packaging {
+        // Memory Lab çekirdeği (libmemcore.so) çalıştırılabilir bir ELF'tir; root ile doğrudan
+        // çalıştırılabilmesi için APK'dan diske çıkarılmalıdır (mmap'lenmemeli).
+        jniLibs { useLegacyPackaging = true }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
