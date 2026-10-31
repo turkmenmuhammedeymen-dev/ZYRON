@@ -192,6 +192,76 @@
     } catch(error) { notify('JSON import failed: '+error.message); }
   });
   $('file-input').addEventListener('click',()=>{selectedFile='';$('import').disabled=true;});
+  // CPM Lab: local-only demonstration. Never connects to or modifies the game.
+  const cpmStoreKey='zyron_cpm_demo_v1';
+  const cpmLimits={coins:500000,cash:50000000};
+  const cpmDefault={coins:0,cash:0,playerId:''};
+  let cpmDemo=safeRead(cpmStoreKey,cpmDefault);
+  if(!cpmDemo||typeof cpmDemo!=='object')cpmDemo={...cpmDefault};
+  cpmDemo={
+    coins:Number.isSafeInteger(cpmDemo.coins)&&cpmDemo.coins>=0&&cpmDemo.coins<=cpmLimits.coins?cpmDemo.coins:0,
+    cash:Number.isSafeInteger(cpmDemo.cash)&&cpmDemo.cash>=0&&cpmDemo.cash<=cpmLimits.cash?cpmDemo.cash:0,
+    playerId:typeof cpmDemo.playerId==='string'?cpmDemo.playerId.slice(0,32):''
+  };
+  const cpmFormat=n=>new Intl.NumberFormat('tr-TR').format(n);
+  const renderCpmDemo=()=>{
+    $('cpm-demo-coins').textContent=cpmFormat(cpmDemo.coins);
+    $('cpm-demo-cash').textContent=cpmFormat(cpmDemo.cash);
+    $('cpm-player-id').value=cpmDemo.playerId;
+  };
+  const saveCpmDemo=()=>persist(cpmStoreKey,cpmDemo);
+  $('cpm-verify').addEventListener('click',()=>{
+    const id=$('cpm-player-id').value.trim();
+    if(!/^[A-Za-z0-9_-]{4,32}$/.test(id)){
+      $('cpm-verify-result').textContent='ID biçimi uygun değil. 4–32 harf, rakam, tire veya alt çizgi kullan.';
+      $('cpm-verify-result').classList.add('invalid');
+      return;
+    }
+    cpmDemo.playerId=id;
+    saveCpmDemo();
+    $('cpm-verify-result').textContent='Biçim uygun. Bu, hesap sahipliğini doğrulamaz ve oyun sunucusuna bağlanmaz.';
+    $('cpm-verify-result').classList.remove('invalid');
+  });
+  $('cpm-app-select').addEventListener('change',()=>{
+    $('cpm-demo-message').textContent='Seçim yalnızca bu yerel demo panelini etiketler; haricî uygulama açılmaz.';
+  });
+  $('cpm-amount').addEventListener('input',()=>{
+    const kind=$('cpm-currency').value;
+    $('cpm-amount').max=String(cpmLimits[kind]);
+  });
+  $('cpm-currency').addEventListener('change',()=>{
+    const kind=$('cpm-currency').value;
+    $('cpm-amount').max=String(cpmLimits[kind]);
+    $('cpm-amount').value=String(cpmLimits[kind]);
+  });
+  document.querySelectorAll('[data-cpm-preset]').forEach(button=>button.addEventListener('click',()=>{
+    const kind=button.dataset.cpmPreset;
+    $('cpm-currency').value=kind;
+    $('cpm-amount').max=String(cpmLimits[kind]);
+    $('cpm-amount').value=String(cpmLimits[kind]);
+  }));
+  $('cpm-apply-demo').addEventListener('click',()=>{
+    const kind=$('cpm-currency').value;
+    const raw=$('cpm-amount').value;
+    const amount=Number(raw);
+    if(!Number.isSafeInteger(amount)||amount<0||amount>cpmLimits[kind]){
+      $('cpm-demo-message').textContent='Geçersiz miktar. Coin üst sınırı 500.000, para üst sınırı 50.000.000.';
+      return;
+    }
+    cpmDemo[kind]=amount;
+    if(!saveCpmDemo())return;
+    renderCpmDemo();
+    $('cpm-demo-message').textContent='Demo bakiyesi yerel ZYRON kaydına uygulandı. Gerçek CPM bakiyesi değişmedi.';
+    log('Updated local CPM '+kind+' demo balance');
+  });
+  $('cpm-reset-demo').addEventListener('click',()=>{
+    cpmDemo.coins=0;cpmDemo.cash=0;
+    if(!saveCpmDemo())return;
+    renderCpmDemo();
+    $('cpm-demo-message').textContent='Yerel demo bakiyesi sıfırlandı. Gerçek oyun hesabına işlem yapılmadı.';
+    log('Reset local CPM demo balance');
+  });
+  renderCpmDemo();
   const platformLabel=$('platform');
   if(platformLabel)platformLabel.textContent=/Android/i.test(navigator.userAgent)?'ANDROID APP':'WEB WORKSPACE';
   if(!storageAvailable)notify('Browser storage is blocked. Exported files are your backup.');
