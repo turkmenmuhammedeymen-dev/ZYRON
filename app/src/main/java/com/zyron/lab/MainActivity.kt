@@ -3,15 +3,18 @@ package com.zyron.lab
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
@@ -70,7 +73,8 @@ class MainActivity : Activity() {
                 }
             }
         }
-        memoryBridge = MemoryBridge(this, webView).also { webView.addJavascriptInterface(it, "ZyronMem") }
+        memoryBridge = MemoryBridge(this, MemoryCore.get(this), webView) { runOnUiThread { openOverlay() } }
+            .also { webView.addJavascriptInterface(it, "ZyronMem") }
         webView.loadUrl(LOCAL_ROOT + "index.html")
         setContentView(webView)
     }
@@ -84,6 +88,21 @@ class MainActivity : Activity() {
         fileChooserCallback = null
     }
 
+    /** Memory Lab'in yüzen penceresini açar; gerekirse önce "üstte göster" iznini ister. */
+    private fun openOverlay() {
+        if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, "ZYRON için \"Diğer uygulamaların üzerinde göster\" iznini aç, sonra tekrar dene.", Toast.LENGTH_LONG).show()
+            startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
+            return
+        }
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 7303)
+        }
+        val intent = Intent(this, OverlayService::class.java)
+        if (Build.VERSION.SDK_INT >= 26) startForegroundService(intent) else startService(intent)
+        Toast.makeText(this, "Yüzen pencere açıldı. Oyunu aç ve Z baloncuğuna dokun.", Toast.LENGTH_LONG).show()
+    }
+
     @Deprecated("Deprecated in Android, retained for broad device compatibility")
     override fun onBackPressed() {
         if (::webView.isInitialized && webView.canGoBack()) webView.goBack() else super.onBackPressed()
@@ -92,7 +111,6 @@ class MainActivity : Activity() {
     override fun onDestroy() {
         fileChooserCallback?.onReceiveValue(null)
         fileChooserCallback = null
-        memoryBridge?.shutdown()
         memoryBridge = null
         if (::webView.isInitialized) {
             webView.stopLoading()

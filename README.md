@@ -14,7 +14,7 @@ ZYRON is a responsive, local-first workspace available on the web and Android. T
 - Profiles — save, load and delete local workspace profiles.
 - Diagnostics — inspect browser/device environment and local activity history.
 - JSON export — export local test values.
-- Memory Lab — optional, rooted Android only: scan, narrow, edit and freeze values in the memory of an app you select (see *Scope and privacy*).
+- Memory Lab — optional, rooted Android only: Game Guardian-style search (exact/range/fuzzy/group/text/bytes/XOR/auto), refine, edit, directional freeze, saved list, pointer search, hex viewer, memory map, dump, pause, JS scripts and a floating window over the app you select (see *Scope and privacy*).
 
 ## Technology
 - HTML, CSS and JavaScript for the shared client
@@ -37,4 +37,4 @@ See `native/README.md` for the Memory Lab architecture, safety limits and tests.
 ## Scope and privacy
 ZYRON's labs (Test Lab, File Lab, Profiles, Diagnostics, CPM Lab demo) work only on local sample data and files the user explicitly selects. Workspace data is stored locally in the browser/WebView.
 
-**Memory Lab is different and is opt-in.** On a rooted Android device, after the user grants root and picks an app, it can read and write that app's memory. Use it only on offline or single-player software you own or are authorized to test, never on online games or other people's accounts. It does not bypass anti-cheat or security controls, does not hide itself, and refuses system processes and protected apps (`com.android.*`, Google Play services, ZYRON itself). It is unavailable in the web client and on non-rooted devices.
+**Memory Lab is different and is opt-in.** On a rooted Android device, after the user grants root and picks an app, it can read and write that app's memory. Use it only on offline or single-player software you own or are authorized to test, never on online games or other people's accounts. It does not bypass anti-cheat or security controls, does not hide itself, has no speed hack or disassembler, and refuses system processes and protected apps (`com.android.*`, Google Play services, ZYRON itself). It is unavailable in the web client and on non-rooted devices.
