@@ -270,3 +270,15 @@
   renderValues();renderStats();
   if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(error=>console.warn('ZYRON offline cache unavailable:',error));
 })();
+(function(){
+  const seg=document.getElementById('cpm-seg'); if(!seg) return;
+  const panes=[...document.querySelectorAll('[data-cpmpane]')];
+  function show(name){
+    seg.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.cpmseg===name));
+    panes.forEach(p=>p.classList.toggle('cpm-hidden',p.dataset.cpmpane!==name));
+  }
+  seg.addEventListener('click',e=>{const b=e.target.closest('[data-cpmseg]'); if(b) show(b.dataset.cpmseg);});
+  const f=document.getElementById('cpm-open-float');
+  if(f) f.addEventListener('click',()=>{ if(window.ZyronMem&&typeof window.ZyronMem.openOverlay==='function') window.ZyronMem.openOverlay(); else { const t=document.getElementById('toast'); if(t){ t.textContent='Yüzen pencere yalnızca Android uygulamasında çalışır.'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); } } });
+  show('profile');
+})();

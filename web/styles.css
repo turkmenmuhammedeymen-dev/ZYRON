@@ -78,3 +78,10 @@ body:not([data-view="overview"]) .section-heading{display:none}
 }
 html.overlay body{padding-bottom:0}
 html.overlay .side-nav{display:none}
+.cpm-seg{display:flex;gap:6px;margin:0 0 14px;padding:4px;border:1px solid var(--line);border-radius:12px;background:#0b121c;overflow-x:auto;scrollbar-width:none}
+.cpm-seg button{flex:1 0 auto;padding:9px 14px;border:1px solid transparent;border-radius:9px;background:transparent;color:#9aa9bb;font-size:12px;font-weight:700;white-space:nowrap}
+.cpm-seg button.active{background:#13252c;border-color:#31504e;color:#7df4d5}
+.cpm-hidden{display:none!important}
+.cpm-grid{grid-template-columns:1fr}
+.cpm-mem .ml-line{margin-top:14px}
+@media(min-width:900px){.cpm-grid{grid-template-columns:1fr 1fr}}
