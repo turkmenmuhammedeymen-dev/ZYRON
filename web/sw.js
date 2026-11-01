@@ -1,6 +1,6 @@
 'use strict';
-const CACHE='zyron-shell-v6';
-const ASSETS=['./index.html','./styles.css','./app.js','./memlab.js','./manifest.webmanifest','./icon.svg'];
+const CACHE='zyron-shell-v7';
+const ASSETS=['./index.html','./styles.css','./memlab.js','./manifest.webmanifest','./icon.svg'];
 
 self.addEventListener('install',event=>{
   event.waitUntil((async()=>{

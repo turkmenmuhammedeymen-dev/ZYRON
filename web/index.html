@@ -2,75 +2,16 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070b12"><meta name="description" content="ZYRON — Beyond the Game. Your private testing and data workspace.">
+<meta name="theme-color" content="#0e0e10"><meta name="description" content="ZYRON Memory Lab — Game Guardian tarzı bellek aracı (root gerekir).">
 <link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg"><link rel="stylesheet" href="./styles.css">
-<title>ZYRON — Beyond the Game</title>
+<title>ZYRON Memory Lab</title>
 </head>
-<body data-view="overview">
-<div class="app-shell">
-<aside class="sidebar">
-<a class="brand" href="#"><span class="brand-symbol">Z</span><span class="brand-word">ZYRON<small>BEYOND THE GAME</small></span></a>
-<div class="side-label">WORKSPACE</div>
-<nav class="side-nav" aria-label="Workspace">
-<button class="nav-item active" data-tab="overview"><i>⌂</i> <span>Overview</span> <b>01</b></button>
-<button class="nav-item" data-tab="memlab"><i>◉</i> <span>Memory Lab</span> <b>02</b></button>
-<button class="nav-item" data-tab="cpmlab"><i>◈</i> <span>CPM Lab</span> <b>03</b></button>
-<button class="nav-item" data-tab="lab"><i>⌘</i> <span>Test Lab</span> <b>04</b></button>
-<button class="nav-item" data-tab="files"><i>▤</i> <span>File Lab</span> <b>05</b></button>
-<button class="nav-item" data-tab="diagnostics"><i>⌁</i> <span>Diagnostics</span> <b>06</b></button>
-</nav>
-<div class="sidebar-bottom"><div class="secure-mark">◆ <span>LOCAL-FIRST ENVIRONMENT</span></div><p>Your workspace. Your data.<br>Stored on this device.</p><div class="version">ZYRON WEB <span>v1.4</span></div></div>
-</aside>
-<main class="main-area">
-<header class="topbar"><div class="breadcrumb">ZYRON <span>/</span> <strong id="crumb">Overview</strong></div><div class="top-actions"><span class="connection"><i></i> LOCAL SESSION</span><div class="avatar">Z</div></div></header>
-<div class="content">
-<section class="hero-banner">
-<div class="hero-copy"><div class="eyebrow"><span></span> YOUR PRIVATE DIGITAL WORKSPACE</div><h1>Beyond the<br><em>Game.</em></h1><p>Powerful tools. Clear insights. Complete control over your own test environment.</p><div class="hero-buttons"><button class="btn-primary" data-go="memlab">Memory Lab <span>↗</span></button><button class="btn-ghost" data-go="cpmlab">CPM Lab</button></div></div>
-<div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit-core">Z<span></span></div><div class="art-caption">SYSTEM<br><b>READY_</b></div></div>
-<div class="hero-index">01 <span>— 04</span></div>
-</section>
-<div class="section-heading"><div><div class="eyebrow">COMMAND CENTER</div><h2>Your workspace at a glance</h2></div><span class="live-pill"><i></i> ALL SYSTEMS LOCAL</span></div>
-<section class="view active" id="overview">
-<div class="metric-grid">
-<article class="metric-card"><div class="metric-top"><span>TEST VALUES</span><b>⌘</b></div><strong id="overview-count">0</strong><small>Saved in this workspace</small><div class="metric-line"></div></article>
-<article class="metric-card"><div class="metric-top"><span>SAVED PROFILES</span><b>▣</b></div><strong id="profile-count">0</strong><small>Your reusable configurations</small><div class="metric-line"></div></article>
-<article class="metric-card"><div class="metric-top"><span>RECENT EVENTS</span><b>⌁</b></div><strong id="event-count">0</strong><small>Latest workspace activity</small><div class="metric-line"></div></article>
-</div>
-<div class="feature-grid">
-<article class="feature-card feature-main"><div class="feature-icon">◉</div><div class="feature-tag">02 / MEMORY</div><h3>Memory Lab</h3><p>Root'lu Android'de seçtiğin uygulamada değer ara, daralt, düzenle, dondur; hex, harita, script ve yüzen pencere.</p><button class="text-link" data-go="memlab">OPEN MEMORY LAB <span>↗</span></button><div class="feature-watermark">Z</div></article>
-<article class="feature-card"><div class="feature-icon">◈</div><div class="feature-tag">03 / GAME PROFILE</div><h3>CPM Lab</h3><p>Car Parking Multiplayer için yerel profil ve çevrimdışı demo.</p><button class="text-link" data-go="cpmlab">OPEN CPM LAB <span>↗</span></button></article>
-<article class="feature-card"><div class="feature-icon">⌘</div><div class="feature-tag">04 / DATA WORKSPACE</div><h3>Test Lab</h3><p>Kendi yerel test değerlerini oluştur, ara, filtrele ve yönet.</p><button class="text-link" data-go="lab">OPEN TEST LAB <span>↗</span></button></article>
-<article class="feature-card"><div class="feature-icon">▤</div><div class="feature-tag">05 / DOCUMENT TOOLS</div><h3>File Lab</h3><p>Seçtiğin belgeyi önizle, JSON içe aktar.</p><button class="text-link" data-go="files">OPEN FILE LAB <span>↗</span></button></article>
-<article class="feature-card"><div class="feature-icon">⌁</div><div class="feature-tag">06 / SYSTEM INSIGHTS</div><h3>Diagnostics</h3><p>Cihaz ortamını ve son etkinlikleri gör.</p><button class="text-link" data-go="diagnostics">VIEW DIAGNOSTICS <span>↗</span></button></article>
-</div>
-<div class="lower-grid"><article class="surface-card"><div class="card-heading"><div><div class="eyebrow">CONFIGURATION</div><h3>Saved profiles</h3></div><span class="subtle-count" id="profile-count-label">0 PROFILES</span></div><div class="profile-create"><input id="profile-name" placeholder="Name this profile" maxlength="40"><button class="btn-primary compact" id="save-profile">Save profile <span>＋</span></button></div><div id="profiles" class="profile-list"></div></article><article class="surface-card privacy-card"><div class="privacy-icon">◇</div><div class="eyebrow">BUILT AROUND PRIVACY</div><h3>Your data stays yours.</h3><p>ZYRON stores workspace data locally in your browser or app. Files are opened only when you choose them.</p><span class="privacy-foot">LOCAL STORAGE <b>● ACTIVE</b></span></article></div>
-<p class="disclaimer">ZYRON's labs work on local sample data and files you choose. The optional Memory Lab (rooted Android only, explicit root approval) can read and edit the memory of an app you select: use it only on offline or single-player software you own or are authorized to test, never on online games or other people's accounts. ZYRON does not bypass anti-cheat or security controls, and system or protected apps cannot be attached.</p>
-</section>
-<section class="view workspace-view" id="lab"><div class="page-title"><div class="eyebrow">DATA WORKSPACE / 04</div><h2>Test Lab<span class="title-dot">.</span></h2><p>Manage and inspect values created inside your ZYRON workspace.</p></div><div class="lab-toolbar"><div class="search-wrap"><span>⌕</span><input id="search" placeholder="Search values by name or content"></div><select id="filter"><option>All</option><option>Exact</option><option>Numbers</option><option>Integer</option><option>Decimal</option><option>Text</option></select></div><form id="add-form" class="add-panel"><div><div class="eyebrow">CREATE ENTRY</div><h3>Add a test value</h3></div><input id="new-key" placeholder="Value name" maxlength="60" required><input id="new-value" placeholder="Value (number or text)" maxlength="200" required><button class="btn-primary" type="submit">Add value <span>＋</span></button></form><div class="range-toolbar"><div class="range-label">NUMERIC RANGE <span>Optional</span></div><input id="min" type="number" step="any" placeholder="Minimum"><input id="max" type="number" step="any" placeholder="Maximum"><button class="btn-ghost" id="export">↓ Export JSON</button></div><div class="list-heading"><h3>Your values</h3><span id="result-count">0 matches · 0 total</span></div><div id="values" class="value-list"></div></section>
-<section class="view workspace-view" id="cpmlab">
-<div class="page-title"><div class="eyebrow">GAME PROFILE / 03</div><h2>CPM Lab<span class="title-dot">.</span></h2><p>Car Parking Multiplayer için yerel profil arayüzü ve çevrimdışı demo simülatörü.</p></div>
-<div class="cpm-identity"><div class="cpm-mark" aria-hidden="true">CPM</div><div><div class="eyebrow">UNOFFICIAL COMMUNITY TOOL</div><h3>Car Parking Multiplayer</h3><p>Bu alan oyunun resmî servisi değildir. Hesap bakiyesini okuyamaz veya değiştiremez.</p></div><span class="demo-status">LOCAL DEMO</span></div>
-<nav class="cpm-seg" id="cpm-seg" aria-label="CPM Lab bölümleri">
-<button type="button" class="active" data-cpmseg="profile">Profil</button>
-<button type="button" data-cpmseg="app">Uygulama</button>
-<button type="button" data-cpmseg="demo">Demo</button>
-<button type="button" data-cpmseg="mem">Memory Lab</button>
-</nav>
-<div class="cpm-grid">
-<article class="surface-card cpm-card" data-cpmpane="profile"><div class="eyebrow">STEP 01 / PLAYER PROFILE</div><h3>Oyuncu ID kontrolü</h3><p class="cpm-help">Oyuncu ID'sini gir. Kontrol yalnızca biçim ve boş alan denetimidir; CPM sunucusuna bağlanmaz.</p><label class="cpm-label" for="cpm-player-id">PLAYER ID</label><input id="cpm-player-id" class="cpm-input" maxlength="32" autocomplete="off" placeholder="Oyuncu ID'sini gir"><button class="btn-primary cpm-wide" id="cpm-verify" type="button">Yerel biçim kontrolü <span>↗</span></button><div class="cpm-result" id="cpm-verify-result" role="status">Henüz kontrol yapılmadı.</div></article>
-<article class="surface-card cpm-card" data-cpmpane="app"><div class="eyebrow">STEP 02 / APP SELECTOR</div><h3>Uygulama seçimi</h3><p class="cpm-help">Bu seçim yalnızca ZYRON içindeki demo görünümünü belirler. Haricî uygulama başlatılmaz.</p><label class="cpm-label" for="cpm-app-select">UYGULAMA</label><select id="cpm-app-select" class="cpm-input"><option value="cpm">Car Parking Multiplayer</option></select><div class="cpm-app-note"><span class="cpm-app-dot"></span> Oyun bağlantısı: <strong>Yok · Yerel demo</strong></div></article>
-</div>
-<article class="surface-card cpm-simulator" data-cpmpane="demo"><div class="cpm-sim-head"><div><div class="eyebrow">STEP 03 / OFFLINE SANDBOX</div><h3>Demo bakiye simülatörü</h3><p>Seçtiğin değerler yalnızca bu tarayıcıdaki ZYRON demo kaydına yazılır.</p></div><span class="demo-status">NOT REAL GAME CURRENCY</span></div>
-<div class="cpm-balance-grid"><div class="cpm-balance"><span>DEMO COINS</span><strong id="cpm-demo-coins">0</strong><small>Limit: 500.000</small></div><div class="cpm-balance"><span>DEMO CASH</span><strong id="cpm-demo-cash">0</strong><small>Limit: 50.000.000</small></div></div>
-<div class="cpm-controls"><div><label class="cpm-label" for="cpm-amount">DEMO MİKTARI</label><input class="cpm-input" id="cpm-amount" type="number" min="0" step="1" value="500000" inputmode="numeric"></div><div><label class="cpm-label" for="cpm-currency">DEMO VARLIK</label><select class="cpm-input" id="cpm-currency"><option value="coins">Coin</option><option value="cash">Para</option></select></div><button class="btn-primary" id="cpm-apply-demo" type="button">Demo bakiyeyi uygula <span>＋</span></button></div>
-<div class="cpm-presets"><button type="button" data-cpm-preset="coins">Coin üst sınırını seç</button><button type="button" data-cpm-preset="cash">Para üst sınırını seç</button><button type="button" id="cpm-reset-demo">Demo bakiyeyi sıfırla</button></div>
-<div class="cpm-notice" id="cpm-demo-message" role="status">Demo hazır. Hiçbir CPM hesabına veya oyun dosyasına erişilmez.</div></article>
-<article class="surface-card cpm-card cpm-mem" data-cpmpane="mem"><div class="eyebrow">STEP 04 / MEMORY LAB</div><h3>Offline oyun belleği</h3><p class="cpm-help">Root'lu telefonda oyunun belleğinde değer arayıp düzenlemek için Memory Lab'i kullan. Car Parking Multiplayer çevrimiçidir: para ve ilerleme sunucuda tutulur, hesap banlanabilir. Yalnızca çevrimdışı ve sahibi olduğun yazılımlarda kullan.</p><div class="ml-line"><button type="button" class="btn-primary" data-go="memlab">Memory Lab'i aç <span>↗</span></button><button type="button" class="btn-ghost" id="cpm-open-float">Yüzen pencere</button></div></article>
-<p class="disclaimer">CPM Lab bağımsız bir demo çalışma alanıdır; Car Parking Multiplayer ile bağlantılı veya onun tarafından onaylanmış değildir. Gerçek oyun bakiyesi, hesap doğrulaması ve çevrimdışı oyun verileri üzerinde işlem yapmaz. Memory Lab ayrı bir araçtır ve çevrimiçi oyunlarda kullanılmamalıdır.</p>
-</section>
-<section class="view workspace-view" id="memlab">
-<div class="page-title"><div class="eyebrow">MEMORY / 02</div><h2>Memory Lab<span class="title-dot">.</span></h2><p>Root'lu Android'de seçtiğin uygulamanın belleğinde değer ara, daralt, düzenle, dondur, incele ve script çalıştır.</p></div>
+<body class="gg">
+<main id="memlab" class="view active">
+<header class="gg-top"><span class="gg-logo">Z</span><div class="gg-title"><b>ZYRON</b><small>Memory Lab</small></div><div class="gg-proc" id="ml-topproc">Süreç seçilmedi</div></header>
 <div class="ml-banner" id="ml-banner" hidden>Memory Lab yalnızca <b>root'lu Android</b> cihazdaki ZYRON uygulamasında çalışır. Tarayıcıda bu bölüm kapalıdır.</div>
+
+<div class="ml-panel active" id="ml-p-proc">
 <div class="ml-warning ml-hide-overlay"><b>Önemli:</b> Sadece çevrimdışı / tek oyunculu ve sahibi olduğun ya da test etmeye yetkili olduğun yazılımlarda kullan. Çevrimiçi oyunlarda kullanma: hesabın banlanabilir. ZYRON anti-cheat korumalarını aşmaya veya kendini gizlemeye çalışmaz. Sistem ve korumalı uygulamalara bağlanılamaz.</div>
 
 <article class="surface-card ml-card" id="ml-step-1">
@@ -82,14 +23,7 @@
 <div class="ml-line"><button class="btn-ghost" id="ml-detach" type="button" hidden>Bağlantıyı kes</button><button class="btn-ghost" id="ml-pause" type="button" data-needs-root title="Oyunu dondurur; arama yaparken değerlerin değişmesini engeller">⏸ Oyunu duraklat</button><button class="btn-ghost" id="ml-float" type="button" hidden>◧ Yüzen pencere</button></div>
 </article>
 
-<nav class="ml-tabs" aria-label="Memory Lab">
-<button type="button" class="ml-tab active" data-mltab="search">Arama</button>
-<button type="button" class="ml-tab" data-mltab="saved">Kayıtlı liste <b id="ml-saved-badge">0</b></button>
-<button type="button" class="ml-tab" data-mltab="hex">Bellek (hex)</button>
-<button type="button" class="ml-tab" data-mltab="maps">Harita</button>
-<button type="button" class="ml-tab" data-mltab="script">Script</button>
-</nav>
-
+</div>
 <div class="ml-panel active" id="ml-p-search">
 <article class="surface-card ml-card" id="ml-step-3"><div class="eyebrow">ARAMA</div><h3>Değeri bul</h3>
 <div class="ml-grid">
@@ -190,14 +124,35 @@ Süreç ve diğer
 Farklar: Lua yerine JavaScript. Bellek aralığı (from/to) ve limit parametreleri yok sayılır. ASM/disassembler ve hız hilesi desteklenmez.</pre></details>
 </article>
 </div>
-</section>
-<section class="view workspace-view" id="files"><div class="page-title"><div class="eyebrow">DOCUMENT TOOLS / 05</div><h2>File Lab<span class="title-dot">.</span></h2><p>Inspect documents you explicitly select. Supported formats: TXT, JSON and XML.</p></div><div class="file-drop"><div class="file-glyph">▤</div><h3>Bring a document into your workspace</h3><p>Select a file from your device to preview it securely.</p><div class="file-actions"><label class="btn-primary file-pick">Choose a file <span>↗</span><input id="file-input" type="file" accept=".txt,.json,.xml,text/plain,application/json,application/xml"></label><button class="btn-ghost" id="import" disabled>Import JSON</button></div><p id="file-name" class="file-name">No file selected</p></div><div class="preview-card"><div class="preview-head"><span>DOCUMENT PREVIEW</span><span>MAX 12 KB DISPLAY</span></div><pre id="preview" class="preview">Your selected document preview will appear here.</pre></div></section>
-<section class="view workspace-view" id="diagnostics"><div class="page-title"><div class="eyebrow">SYSTEM INSIGHTS / 06</div><h2>Diagnostics<span class="title-dot">.</span></h2><p>A transparent overview of this browser or device session.</p></div><div class="diagnostic-banner"><span class="diagnostic-pulse"></span><div><b>Workspace operational</b><small>Local tools are ready for use.</small></div><span class="live-pill">LOCAL</span></div><div id="diagnostic-rows" class="diagnostics"></div><div class="history-card"><div class="card-heading"><div><div class="eyebrow">SESSION LOG</div><h3>Activity history</h3></div></div><div id="history" class="history"></div></div></section>
-<footer><span>© ZYRON</span><span>BEYOND THE GAME</span><span>LOCAL-FIRST WORKSPACE</span></footer>
+<div class="ml-panel" id="ml-p-settings">
+<article class="surface-card ml-card"><div class="eyebrow">AYARLAR</div><h3>Veriler</h3>
+<div class="ml-line"><button class="btn-ghost" id="ml-set-clear-saved" type="button">Kayıtlı listeyi temizle</button><button class="btn-ghost" id="ml-set-clear-scripts" type="button">Kayıtlı scriptleri sil</button></div>
+<p class="fine">Kayıtlı liste ve scriptler yalnızca bu cihazda, uygulamanın içinde saklanır.</p></article>
+<article class="surface-card ml-card"><div class="eyebrow">DESTEKLENENLER</div><h3>Ne yapabilir?</h3>
+<ul class="ml-feat">
+<li>Tam değer, aralık, bulanık, grup, metin, bayt, XOR ve Auto arama</li>
+<li>Daralt: eşit, eşit değil, büyük, küçük, değişti, değişmedi, arttı, azaldı, kadar arttı/azaldı</li>
+<li>Değer yaz, toplu yaz, dondur (sabit / yalnız artsın / yalnız azalsın), ofset kaydır</li>
+<li>İşaretçi ara ve işaretçiye git</li>
+<li>Kayıtlı liste (dışa/içe aktar), hex görüntüleyici ve bayt yazma, bellek haritası, bellek dökümü</li>
+<li>Oyunu duraklat / sürdür, yüzen pencere, JavaScript <code>gg</code> script API'si</li>
+</ul></article>
+<article class="surface-card ml-card"><div class="eyebrow">DESTEKLENMEYENLER</div><h3>Bilerek yok</h3>
+<ul class="ml-feat"><li>Hız hilesi</li><li>Kendini gizleme ve anti-cheat atlatma</li><li>ASM yama / disassembler</li><li>Lua (yerine JavaScript script var, Lua scriptleri olduğu gibi çalışmaz)</li></ul></article>
+<article class="surface-card ml-card"><div class="eyebrow">HAKKINDA</div><h3>ZYRON Memory Lab <span class="ml-ver">v2.0</span></h3>
+<p class="fine">Yalnızca çevrimdışı veya sahibi olduğun / test etmeye yetkili olduğun yazılımlarda kullan. Çevrimiçi oyunlarda hesabın banlanabilir ve değerler çoğunlukla sunucuda tutulur. Sistem ve korumalı uygulamalara bağlanılamaz.</p></article>
 </div>
+<nav class="ml-tabs" aria-label="Memory Lab">
+<button type="button" class="ml-tab active" data-mltab="proc"><i>◉</i><span>Süreç</span></button>
+<button type="button" class="ml-tab" data-mltab="search"><i>⌕</i><span>Arama</span></button>
+<button type="button" class="ml-tab" data-mltab="saved"><i>★</i><span>Liste</span><b id="ml-saved-badge">0</b></button>
+<button type="button" class="ml-tab" data-mltab="hex"><i>⌗</i><span>Bellek</span></button>
+<button type="button" class="ml-tab" data-mltab="maps"><i>▦</i><span>Harita</span></button>
+<button type="button" class="ml-tab" data-mltab="script"><i>‹›</i><span>Script</span></button>
+<button type="button" class="ml-tab" data-mltab="settings"><i>⚙</i><span>Ayarlar</span></button>
+</nav>
 </main>
-</div>
 <div class="toast" id="toast" role="status"></div>
-<script src="./app.js" defer></script>
 <script src="./memlab.js" defer></script>
-</body></html>
+</body>
+</html>

@@ -889,6 +889,22 @@ v.forEach(x => print(x.name, '0x' + x.address.toString(16), x.flags, x.value));`
     enableControls(false);
   }
   syncMode(); renderResults(); renderProcs(); renderFrozen(); renderSaved(); renderMaps(); renderHex();
-  if (overlayMode) { const t = document.querySelector('[data-tab="memlab"]'); if (t) t.click(); }
+
+  // ---- GG tarzı üst süreç çubuğu, otomatik sekme geçişi, ayarlar ----
+  (function () {
+    const chip = $('ml-topproc'), att = $('ml-attached'); let wasAttached = false;
+    function sync() {
+      const txt = att.textContent.trim(), on = /Bağlı/.test(txt);
+      chip.textContent = on ? txt.replace(/^Bağlı:?\s*/, '') : 'Süreç seçilmedi';
+      chip.classList.toggle('on', on);
+      if (on && !wasAttached) showTab('search');
+      if (!on && wasAttached) showTab('proc');
+      wasAttached = on;
+    }
+    new MutationObserver(sync).observe(att, { childList: true, characterData: true, subtree: true });
+    sync();
+    $('ml-set-clear-saved').addEventListener('click', () => { st.saved = []; persistSaved(); renderSaved(); toast('Kayıtlı liste temizlendi.'); });
+    $('ml-set-clear-scripts').addEventListener('click', () => { try { localStorage.removeItem('zyron_ml_scripts_v1'); } catch (_) {} toast('Kayıtlı scriptler silindi (sayfayı yenileyince listeden kalkar).'); });
+  })();
   adopt();
 })();

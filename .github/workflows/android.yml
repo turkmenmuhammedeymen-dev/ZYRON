@@ -12,10 +12,8 @@ jobs:
       - name: Validate web assets
         run: |
           test -s web/index.html
-          test -s web/app.js
           test -s web/styles.css
           test -s web/memlab.js
-          node --check web/app.js
           node --check web/memlab.js
       - uses: actions/upload-artifact@v4
         with:

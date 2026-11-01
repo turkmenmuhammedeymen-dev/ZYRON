@@ -55,9 +55,10 @@ window.addEventListener('load', async () => {
   try {
     const ad = await A(); const gold = ad.gold, decoy = ad.decoy, hp = ad.hp, enc = ad.enc, pl = ad.pl, holder = ad.holder, name = ad.name;
     const hex = n => '0x' + BigInt(n).toString(16);
-    ok('app.js still boots', $('overview-count').textContent === '4', $('overview-count').textContent);
-    document.querySelector('[data-tab="memlab"]').click();
-    ok('memlab tab opens', $('memlab').classList.contains('active'));
+    ok('memlab is the only screen', $('memlab').classList.contains('active') && !document.querySelector('.sidebar, .hero-banner, #lab, #cpmlab'));
+    ok('process panel is the start screen', $('ml-p-proc').classList.contains('active'));
+    ok('top chip says no process', $('ml-topproc').textContent === 'Süreç seçilmedi');
+    ok('seven GG-style bottom tabs', document.querySelectorAll('.ml-tabs .ml-tab').length === 7);
     ok('banner hidden when bridge exists', $('ml-banner').hidden === true);
     ok('controls disabled before root', $('ml-scan').disabled === true);
     ok('float button visible in the app', $('ml-float').hidden === false);
@@ -70,6 +71,8 @@ window.addEventListener('load', async () => {
     setv('ml-proc-q', 'target');
     [...document.querySelectorAll('.ml-proc')].find(x => x.textContent.includes('target')).click();
     ok('attached', await waitFor(() => $('ml-attached').textContent.includes('Bağlı') && $('ml-attached').textContent.includes('64 bit')), $('ml-attached').textContent);
+    ok('top chip shows the target', await waitFor(() => $('ml-topproc').classList.contains('on') && $('ml-topproc').textContent.includes('target')), $('ml-topproc').textContent);
+    ok('auto switch to search after attach', await waitFor(() => $('ml-p-search').classList.contains('active')));
 
     // --- tam deger, daralt, yaz ---
     await idle(); $('ml-scan').click();
@@ -101,7 +104,7 @@ window.addEventListener('load', async () => {
     await idle(); rowOf(gold).querySelector('[data-act=save]').click();
     ok('saved badge counts 1', await waitFor(() => $('ml-saved-badge').textContent === '1'));
     document.querySelector('[data-mltab=saved]').click();
-    ok('saved row shows live value', await waitFor(() => { const v = document.querySelector('#ml-saved .ml-val'); return v && v.value === '4242'; }));
+    ok('saved row shows live value', await waitFor(() => { const v = document.querySelector('#ml-saved .ml-val'); return v && v.value === '4242'; }), document.querySelector('.ml-panel.active').id + ' | ' + $('ml-saved').innerHTML.slice(0,300) + ' | ' + $('toast').textContent);
     const sv = document.querySelector('#ml-saved .ml-row');
     sv.querySelector('.ml-val').value = '5000'; sv.querySelector('[data-act=set]').click();
     ok('saved list writes', await waitFor(async () => (await tg('get')).gold === '5000'));
@@ -263,8 +266,6 @@ window.addEventListener('load', async () => {
   try {
     const ad = await A();
     ok('overlay class set', document.documentElement.classList.contains('overlay'));
-    ok('sidebar hidden in overlay', getComputedStyle(document.querySelector('.sidebar')).display === 'none');
-    ok('hero hidden in overlay', getComputedStyle(document.querySelector('.hero-banner')).display === 'none');
     ok('memlab shown automatically', $('memlab').classList.contains('active'));
     ok('float button hidden in overlay', $('ml-float').hidden === true);
     ok('session adopted without asking for root', await waitFor(() => $('ml-status').classList.contains('ml-ok')), $('ml-status').textContent);
@@ -289,7 +290,7 @@ class H(http.server.SimpleHTTPRequestHandler):
         if u.path in ("/test1.html", "/test2.html"):
             html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
             first = u.path == "/test1.html"
-            html = html.replace('<script src="./app.js" defer></script>', mock(not first) + '<script src="./app.js" defer></script>')
+            html = html.replace('<script src="./memlab.js" defer></script>', mock(not first) + '<script src="./memlab.js" defer></script>')
             html = html.replace('<script src="./memlab.js" defer></script>', '<script src="./memlab.js" defer></script><script defer>' + (DRIVER1 if first else DRIVER2).replace("<script defer>", "") + '</script>')
             return self._text(html, "text/html")
         if u.path == "/send":
