@@ -903,6 +903,7 @@ v.forEach(x => print(x.name, '0x' + x.address.toString(16), x.flags, x.value));`
     }
     new MutationObserver(sync).observe(att, { childList: true, characterData: true, subtree: true });
     sync();
+    document.querySelectorAll('[data-open-tab]').forEach(b => b.addEventListener('click', () => { showTab(b.dataset.openTab); window.scrollTo(0, 0); }));
     $('ml-set-clear-saved').addEventListener('click', () => { st.saved = []; persistSaved(); renderSaved(); toast('Kayıtlı liste temizlendi.'); });
     $('ml-set-clear-scripts').addEventListener('click', () => { try { localStorage.removeItem('zyron_ml_scripts_v1'); } catch (_) {} toast('Kayıtlı scriptler silindi (sayfayı yenileyince listeden kalkar).'); });
   })();

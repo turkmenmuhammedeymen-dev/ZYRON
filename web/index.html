@@ -12,6 +12,7 @@
 <div class="ml-banner" id="ml-banner" hidden>Memory Lab yalnızca <b>root'lu Android</b> cihazdaki ZYRON uygulamasında çalışır. Tarayıcıda bu bölüm kapalıdır.</div>
 
 <div class="ml-panel active" id="ml-p-proc">
+<div class="ml-line"><button class="btn-ghost" type="button" data-open-tab="guide">📖 Kullanım rehberi</button></div>
 <div class="ml-warning ml-hide-overlay"><b>Önemli:</b> Sadece çevrimdışı / tek oyunculu ve sahibi olduğun ya da test etmeye yetkili olduğun yazılımlarda kullan. Çevrimiçi oyunlarda kullanma: hesabın banlanabilir. ZYRON anti-cheat korumalarını aşmaya veya kendini gizlemeye çalışmaz. Sistem ve korumalı uygulamalara bağlanılamaz.</div>
 
 <article class="surface-card ml-card" id="ml-step-1">
@@ -124,8 +125,23 @@ Süreç ve diğer
 Farklar: Lua yerine JavaScript. Bellek aralığı (from/to) ve limit parametreleri yok sayılır. ASM/disassembler ve hız hilesi desteklenmez.</pre></details>
 </article>
 </div>
+<div class="ml-panel" id="ml-p-guide">
+<article class="surface-card ml-card"><div class="card-heading"><div><div class="eyebrow">REHBER</div><h3>Nasıl kullanılır?</h3></div><button class="btn-ghost" type="button" data-open-tab="proc">‹ Geri</button></div>
+<p class="fine">Başlıklara dokunup aç. Root'lu telefon gerekir; çevrimiçi oyunlarda kullanma.</p>
+<details class="ml-guide" open><summary>1 · Kurulum ve root</summary><ol><li>APK'yı GitHub'da <b>Releases → latest → zyron-memory-lab.apk</b> adresinden indir, kur ("bilinmeyen kaynak" iznini ver).</li><li>Telefon <b>root'lu</b> olmalı (Magisk gibi). Root yoksa bu bölüm çalışmaz.</li></ol></details>
+<details class="ml-guide"><summary>2 · Oyuna bağlanma</summary><ol><li><b>Süreç</b> sekmesinde <b>Root'u kontrol et</b>'e bas, Magisk'te <b>Ver</b>.</li><li>Oyunu aç, ZYRON'a dön, <b>Yenile</b>'ye bas.</li><li>Listeden oyunu seç. Üstte adı görünür ve Arama açılır.</li></ol></details>
+<details class="ml-guide"><summary>3 · Değer bulma (altın 1000 örneği)</summary><ol><li><b>Arama</b>: Tür Dword, Değer <code>1000</code>, <b>Tara</b>.</li><li>Oyunda altını değiştir (900 oldu). <b>Daralt</b>'ta Değer <code>900</code>, <b>Daralt</b>.</li><li>1–3 adres kalana kadar tekrarla.</li><li>Değeri yazıp <b>Yaz</b>'a bas. Sabit kalsın istersen <b>❄</b>.</li></ol><p class="fine">Küsuratlı sayı: Float. Çok büyük sayı: Qword. Emin değilsen Auto.</p></details>
+<details class="ml-guide"><summary>4 · Değeri bilmiyorsan (bulanık)</summary><ol><li>Arama kipi <b>Bulanık</b> → <b>Tara</b>.</li><li>Oyunda değeri değiştir (azalt/artır).</li><li><b>Daralt</b>'ta Arttı / Azaldı / Değişti / Değişmedi seç. Tekrarla.</li></ol></details>
+<details class="ml-guide"><summary>5 · Dondurma</summary><p class="fine">❄ değeri her 50 ms'de yeniden yazar. Kipler: <b>sabit</b>, <b>yalnız artabilir</b> (can/para düşmesin), <b>yalnız azalabilir</b>. Dondurulanlar sayfanın altında listelenir; uygulama kapanınca bırakılır.</p></details>
+<details class="ml-guide"><summary>6 · Liste, Bellek, Harita</summary><ul><li><b>Liste:</b> ＋ ile ekle, adlandır, düzenle, dondur, dışa/içe aktar.</li><li><b>Bellek:</b> adresi hex olarak gör, bayta dokun, bayt yaz, dosyaya dök.</li><li><b>Harita:</b> bellek bölgeleri; dokununca Bellek'te açılır.</li><li>Sonuçta <b>⋯</b>: işaretçi ara / işaretçiye git.</li></ul></details>
+<details class="ml-guide"><summary>7 · Script</summary><p class="fine"><b>Script</b> sekmesinde bir şablon seç, <b>Çalıştır</b>. GG benzeri <code>gg</code> API'si JavaScript'tir (Lua değil). Yalnızca güvendiğin scriptleri çalıştır.</p></details>
+<details class="ml-guide"><summary>8 · Yüzen pencere</summary><ol><li>Önce ana uygulamada root'u ve oyunu seç.</li><li><b>Süreç</b>'te <b>Yüzen pencere</b>'ye bas; "diğer uygulamaların üzerinde göster" ve bildirim izni ver, tekrar bas.</li><li>Oyunda <b>Z</b> baloncuğuna dokun: panel açılır. Başlıktan sürükle, — küçült, ✕ kapat.</li></ol></details>
+<details class="ml-guide"><summary>9 · Sorun giderme</summary><ul><li><b>Root alınamadı:</b> Magisk'te ZYRON'a izin ver.</li><li><b>Liste boş:</b> önce oyunu aç, sonra Yenile.</li><li><b>Bulunamadı:</b> türü değiştir, bölgeleri genişlet, değeri ekrandaki gibi yaz.</li><li><b>Değer geri dönüyor:</b> ❄ ile dondur. Çevrimiçi oyunda sunucu geri alır.</li><li><b>Oyun donuk:</b> Süreç'te <b>Oyunu sürdür</b>.</li></ul></details>
+<details class="ml-guide"><summary>10 · Uyarılar</summary><p class="fine">Yalnızca çevrimdışı veya sahibi olduğun yazılımlarda kullan. Çevrimiçi oyunlarda hesabın banlanır. Hız hilesi, gizlenme, ASM yama ve Lua yok. Sistem ve korumalı uygulamalara bağlanılamaz.</p></details>
+</article></div>
 <div class="ml-panel" id="ml-p-settings">
 <article class="surface-card ml-card"><div class="eyebrow">AYARLAR</div><h3>Veriler</h3>
+<div class="ml-line"><button class="btn-ghost" type="button" data-open-tab="guide">📖 Kullanım rehberi</button></div>
 <div class="ml-line"><button class="btn-ghost" id="ml-set-clear-saved" type="button">Kayıtlı listeyi temizle</button><button class="btn-ghost" id="ml-set-clear-scripts" type="button">Kayıtlı scriptleri sil</button></div>
 <p class="fine">Kayıtlı liste ve scriptler yalnızca bu cihazda, uygulamanın içinde saklanır.</p></article>
 <article class="surface-card ml-card"><div class="eyebrow">DESTEKLENENLER</div><h3>Ne yapabilir?</h3>
