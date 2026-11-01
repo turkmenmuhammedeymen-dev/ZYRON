@@ -97,7 +97,9 @@
   document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>{
     document.querySelectorAll('[data-tab]').forEach(item=>item.classList.toggle('active',item===button));
     document.querySelectorAll('.view').forEach(view=>view.classList.toggle('active',view.id===button.dataset.tab));
-    $('crumb').textContent=button.textContent.trim().replace(/[0-9]/g,'').trim();
+    $('crumb').textContent=button.textContent.trim().replace(/[0-9]/g,'').replace(/^\S\s+/,'').trim();
+    document.body.dataset.view=button.dataset.tab;
+    window.scrollTo(0,0);
   }));
   document.querySelectorAll('[data-go]').forEach(button=>button.addEventListener('click',()=>{
     const target=document.querySelector('[data-tab="'+button.dataset.go+'"]');

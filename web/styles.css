@@ -22,3 +22,59 @@
 /* yuzen pencere (index.html?overlay=1): yalnizca Memory Lab, kompakt */
 html.overlay .sidebar,html.overlay .topbar,html.overlay .hero-banner,html.overlay .section-heading,html.overlay footer,html.overlay .ml-hide-overlay,html.overlay .page-title,html.overlay #overview,html.overlay .disclaimer{display:none!important}
 html.overlay body{font-size:13px}html.overlay .main-area{margin:0}html.overlay .content{padding:6px 8px}html.overlay .surface-card{padding:11px;border-radius:10px}html.overlay .ml-card{margin-top:8px}html.overlay .ml-row{padding:7px 8px}html.overlay .toast{bottom:8px;right:8px;left:8px;text-align:center}
+
+/* ===== Düzen düzeltmeleri v1.4: sayfa başlığı, alt menü, Memory Lab düzeni ===== */
+body:not([data-view="overview"]) .hero-banner,
+body:not([data-view="overview"]) .section-heading{display:none}
+.nav-item span{flex:1}
+.fine{font-size:12px;line-height:1.5;color:#8fa0b3;margin:8px 0;font-weight:400}
+.ml-card{margin-bottom:14px}
+.ml-card h3{margin:2px 0 12px}
+.ml-line{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.ml-line>input,.ml-line>select{flex:1 1 140px;min-width:0}
+.ml-line>button{flex:1 1 auto}
+.ml-line>.ml-status{flex:1 1 100%;font-size:12px;color:#8fa0b3}
+.ml-procs{display:flex;flex-wrap:wrap;gap:6px;max-height:190px;overflow:auto;margin:6px 0}
+.ml-procs:empty{display:none}
+.ml-attached{font-size:13px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#0b121c;color:#b7c5d6;margin:8px 0}
+.ml-warning{font-size:12px;line-height:1.5;padding:10px 12px;margin:0 0 12px}
+.ml-warning b{display:inline}
+.ml-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:12;background:var(--bg,#070b12);padding:8px 0;margin:6px 0 12px;border-bottom:1px solid var(--line)}
+.ml-tabs::-webkit-scrollbar{display:none}
+.ml-tab{flex:0 0 auto;white-space:nowrap;padding:8px 14px;font-size:12px}
+.ml-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.ml-next{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);align-items:end}
+.ml-tools{align-items:center}
+.ml-tools .ml-small{flex:1 1 130px}
+.ml-live{display:flex;align-items:center;gap:6px;font-size:12px;color:#b7c5d6;flex:0 0 auto}
+.ml-pager{justify-content:space-between}
+.ml-pager button{flex:0 0 auto}
+.ml-regions-box{margin:10px 0;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#0b121c}
+.ml-regions-box summary{cursor:pointer;font-size:13px;font-weight:700}
+.ml-console,.ml-apitext{max-width:100%;overflow:auto;font-size:11px;line-height:1.5}
+.ml-code{width:100%;box-sizing:border-box;min-height:220px}
+.ml-row{flex-wrap:wrap}
+.ml-hexview{overflow-x:auto}
+@media(max-width:720px){
+  body{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+  .sidebar{position:static;padding:10px 14px}
+  .sidebar .side-label,.sidebar .sidebar-bottom{display:none}
+  .side-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(6,1fr);gap:2px;overflow:visible;
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));background:rgba(9,15,24,.97);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
+  .nav-item{flex-direction:column;justify-content:center;gap:3px;padding:6px 1px;text-align:center;font-size:9px;line-height:1.15;white-space:normal;border-radius:10px;min-height:52px}
+  .nav-item i{font-size:18px;font-style:normal;line-height:1}
+  .nav-item span{flex:0 0 auto}
+  .nav-item b{display:none}
+  .topbar{padding:8px 14px}
+  .topbar .connection{display:none}
+  .content{padding:12px 12px 24px}
+  .page-title{margin:6px 0 14px}
+  .page-title h2{font-size:34px}
+  .page-title p{font-size:13px}
+  .ml-tabs{top:0;margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px}
+  .ml-grid{grid-template-columns:1fr 1fr}
+  .ml-grid>div:nth-child(3):last-child{grid-column:1 / -1}
+  .feature-grid{grid-template-columns:1fr}
+}
+html.overlay body{padding-bottom:0}
+html.overlay .side-nav{display:none}
