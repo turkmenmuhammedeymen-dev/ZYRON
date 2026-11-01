@@ -209,3 +209,11 @@ html.overlay .gg-top{margin:0 -6px 6px;padding:6px 8px}
 html.overlay .surface-card{padding:10px;border-radius:9px}
 html.overlay .ml-card{margin-bottom:8px}
 html.overlay .ml-hide-overlay{display:none}
+.ml-guide{margin:8px 0;border:1px solid var(--line);border-radius:10px;background:#141417;padding:0 12px}
+.ml-guide summary{cursor:pointer;padding:12px 0;font-size:14px;font-weight:800;list-style:none}
+.ml-guide summary::-webkit-details-marker{display:none}
+.ml-guide summary::before{content:"▸ ";color:var(--mint)}
+.ml-guide[open] summary::before{content:"▾ "}
+.ml-guide ol,.ml-guide ul{margin:0 0 10px;padding-left:20px;font-size:13px;line-height:1.7;color:#d3d3da}
+.ml-guide .fine{margin:0 0 12px}
+.ml-guide code{background:#101013;padding:1px 5px;border-radius:5px;font-size:12px}

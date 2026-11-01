@@ -58,6 +58,10 @@ window.addEventListener('load', async () => {
     ok('memlab is the only screen', $('memlab').classList.contains('active') && !document.querySelector('.sidebar, .hero-banner, #lab, #cpmlab'));
     ok('process panel is the start screen', $('ml-p-proc').classList.contains('active'));
     ok('top chip says no process', $('ml-topproc').textContent === 'Süreç seçilmedi');
+    $('ml-p-proc').querySelector('[data-open-tab=guide]').click();
+    ok('guide opens from the process screen', $('ml-p-guide').classList.contains('active') && document.querySelectorAll('.ml-guide').length >= 8);
+    $('ml-p-guide').querySelector('[data-open-tab=proc]').click();
+    ok('guide back button returns', $('ml-p-proc').classList.contains('active'));
     ok('seven GG-style bottom tabs', document.querySelectorAll('.ml-tabs .ml-tab').length === 7);
     ok('banner hidden when bridge exists', $('ml-banner').hidden === true);
     ok('controls disabled before root', $('ml-scan').disabled === true);

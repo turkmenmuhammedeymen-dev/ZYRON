@@ -8,6 +8,8 @@ ZYRON is a responsive, local-first workspace available on the web and Android. T
 - **Web:** Open the deployed Vercel site in a desktop or mobile browser. The web client is a Progressive Web App with an offline shell cache.
 - **Android:** The Android app hosts the exact same `web/` client in a secure WebView. Gradle copies web assets into the APK during `preBuild`.
 
+**Kullanım kılavuzu (Türkçe): [docs/KULLANIM.md](docs/KULLANIM.md)** · APK: GitHub **Releases → latest** (veya Actions → `zyron-android-apk`).
+
 ## Memory Lab (the whole app)
 ZYRON is now a single Game Guardian-style screen: a process bar on top and a bottom menu with Process, Search, Saved list, Memory (hex), Map, Script and Settings. The old Test Lab, File Lab, Diagnostics, Profiles and CPM Lab demo screens were removed.
 - Memory Lab — optional, rooted Android only: Game Guardian-style search (exact/range/fuzzy/group/text/bytes/XOR/auto), refine, edit, directional freeze, saved list, pointer search, hex viewer, memory map, dump, pause, JS scripts and a floating window over the app you select (see *Scope and privacy*).
