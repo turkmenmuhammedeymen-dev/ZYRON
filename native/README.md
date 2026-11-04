@@ -34,13 +34,14 @@ Types: `i8 i16 i32 i64 f32 f64 xor bytes auto`.
 - No shell; the Kotlin bridge forwards only an allow-list of verbs with a strict character pattern, and the WebView
   refuses to navigate away from the bundled local pages.
 - Frozen values are released automatically when the target process exits.
-- Not included on purpose: anti-cheat evasion, self-hiding, speed hack, ASM patching/disassembly. Lua scripts are
-  replaced by a JavaScript `gg`-like API in the UI (not Lua-compatible).
+- Not included: anti-cheat evasion, self-hiding, speed hack, ASM patching/disassembly. Scripts run in the UI: a Lua 5.3
+  subset (own interpreter, `web/lua.js`, tested by `native/test_lua.js`) or JavaScript, both with a `gg`-like API.
 
 ## Build and test
 ```
 bash native/build-android.sh          # needs ANDROID_NDK_HOME; outputs app/src/main/jniLibs/<abi>/libmemcore.so
 sudo python3 native/test_memcore.py   # core: 117 checks (search kinds, refine, freeze modes, pointers, pause, limits)
+node native/test_lua.js               # Lua interpreter: 43 checks (no root needed)
 sudo python3 native/test_ui.py        # real headless Chrome + real core drives the Memory Lab UI (normal + overlay)
 ```
 Sanitizer run: `CORE_CC="cc -fsanitize=address,undefined -g -O1" sudo -E python3 native/test_memcore.py`.

@@ -92,8 +92,8 @@
 
 <div class="ml-panel" id="ml-p-script">
 <article class="surface-card ml-card"><div class="eyebrow">SCRIPT</div><h3>JavaScript ile otomasyon</h3>
-<p class="cpm-help">Game Guardian'ın Lua scriptlerine benzer <code>gg</code> API'si (JavaScript, <code>await</code> ile). Yalnızca kendi yazdığın veya güvendiğin scriptleri çalıştır: script bağlı uygulamanın belleğine yazabilir.</p>
-<div class="ml-line"><select class="cpm-input" id="ml-script-sel"></select><input class="cpm-input" id="ml-script-name" placeholder="script adı" maxlength="40"><button class="btn-ghost" id="ml-script-save" type="button">Kaydet</button><button class="btn-ghost danger" id="ml-script-del" type="button">Sil</button></div>
+<p class="cpm-help">Game Guardian'ın <code>gg</code> API'si. <b>Lua</b> (Lua 5.3'ün büyük bir alt kümesi, GG scriptleri gibi senkron yazılır) veya <b>JavaScript</b> (<code>await</code> ile) seç. Yalnızca kendi yazdığın veya güvendiğin scriptleri çalıştır: script bağlı uygulamanın belleğine yazabilir.</p>
+<div class="ml-line"><select class="cpm-input ml-small" id="ml-script-lang" aria-label="Script dili"><option value="lua" selected>Lua</option><option value="js">JavaScript</option></select><select class="cpm-input" id="ml-script-sel"></select><input class="cpm-input" id="ml-script-name" placeholder="script adı" maxlength="40"><button class="btn-ghost" id="ml-script-save" type="button">Kaydet</button><button class="btn-ghost danger" id="ml-script-del" type="button">Sil</button></div>
 <textarea class="ml-code" id="ml-script-code" spellcheck="false" autocapitalize="off" autocomplete="off" rows="14"></textarea>
 <div class="ml-line"><button class="btn-primary" id="ml-script-run" type="button" data-needs-root>▶ Çalıştır</button><button class="btn-ghost" id="ml-script-stop" type="button" disabled>■ Durdur</button><button class="btn-ghost" id="ml-script-clear" type="button">Konsolu temizle</button></div>
 <pre class="ml-console" id="ml-script-out" role="log">Konsol hazır.</pre>
@@ -134,7 +134,7 @@ Farklar: Lua yerine JavaScript. Bellek aralığı (from/to) ve limit parametrele
 <details class="ml-guide"><summary>4 · Değeri bilmiyorsan (bulanık)</summary><ol><li>Arama kipi <b>Bulanık</b> → <b>Tara</b>.</li><li>Oyunda değeri değiştir (azalt/artır).</li><li><b>Daralt</b>'ta Arttı / Azaldı / Değişti / Değişmedi seç. Tekrarla.</li></ol></details>
 <details class="ml-guide"><summary>5 · Dondurma</summary><p class="fine">❄ değeri her 50 ms'de yeniden yazar. Kipler: <b>sabit</b>, <b>yalnız artabilir</b> (can/para düşmesin), <b>yalnız azalabilir</b>. Dondurulanlar sayfanın altında listelenir; uygulama kapanınca bırakılır.</p></details>
 <details class="ml-guide"><summary>6 · Liste, Bellek, Harita</summary><ul><li><b>Liste:</b> ＋ ile ekle, adlandır, düzenle, dondur, dışa/içe aktar.</li><li><b>Bellek:</b> adresi hex olarak gör, bayta dokun, bayt yaz, dosyaya dök.</li><li><b>Harita:</b> bellek bölgeleri; dokununca Bellek'te açılır.</li><li>Sonuçta <b>⋯</b>: işaretçi ara / işaretçiye git.</li></ul></details>
-<details class="ml-guide"><summary>7 · Script</summary><p class="fine"><b>Script</b> sekmesinde bir şablon seç, <b>Çalıştır</b>. GG benzeri <code>gg</code> API'si JavaScript'tir (Lua değil). Yalnızca güvendiğin scriptleri çalıştır.</p></details>
+<details class="ml-guide"><summary>7 · Script (Lua / JavaScript)</summary><p class="fine"><b>Script</b> sekmesinde dili (<b>Lua</b> veya JavaScript) ve bir şablonu seç, <b>Çalıştır</b>. Lua scriptleri GG gibi yazılır: <code>gg.searchNumber('1000', gg.TYPE_DWORD)</code>, <code>gg.getResults(10)</code>, <code>gg.editAll('99999', gg.TYPE_DWORD)</code>. Lua 5.3'ün büyük bir alt kümesidir; 64 bit tamsayı ve karmaşık <code>goto</code> yoktur. Yalnızca güvendiğin scriptleri çalıştır.</p></details>
 <details class="ml-guide"><summary>8 · Yüzen pencere</summary><ol><li>Önce ana uygulamada root'u ve oyunu seç.</li><li><b>Süreç</b>'te <b>Yüzen pencere</b>'ye bas; "diğer uygulamaların üzerinde göster" ve bildirim izni ver, tekrar bas.</li><li>Oyunda <b>Z</b> baloncuğuna dokun: panel açılır. Başlıktan sürükle, — küçült, ✕ kapat.</li></ol></details>
 <details class="ml-guide"><summary>9 · Sorun giderme</summary><ul><li><b>Root alınamadı:</b> Magisk'te ZYRON'a izin ver.</li><li><b>Liste boş:</b> önce oyunu aç, sonra Yenile.</li><li><b>Bulunamadı:</b> türü değiştir, bölgeleri genişlet, değeri ekrandaki gibi yaz.</li><li><b>Değer geri dönüyor:</b> ❄ ile dondur. Çevrimiçi oyunda sunucu geri alır.</li><li><b>Oyun donuk:</b> Süreç'te <b>Oyunu sürdür</b>.</li></ul></details>
 <details class="ml-guide"><summary>10 · Uyarılar</summary><p class="fine">Yalnızca çevrimdışı veya sahibi olduğun yazılımlarda kullan. Çevrimiçi oyunlarda hesabın banlanır. Hız hilesi, gizlenme, ASM yama ve Lua yok. Sistem ve korumalı uygulamalara bağlanılamaz.</p></details>
@@ -151,10 +151,11 @@ Farklar: Lua yerine JavaScript. Bellek aralığı (from/to) ve limit parametrele
 <li>Değer yaz, toplu yaz, dondur (sabit / yalnız artsın / yalnız azalsın), ofset kaydır</li>
 <li>İşaretçi ara ve işaretçiye git</li>
 <li>Kayıtlı liste (dışa/içe aktar), hex görüntüleyici ve bayt yazma, bellek haritası, bellek dökümü</li>
-<li>Oyunu duraklat / sürdür, yüzen pencere, JavaScript <code>gg</code> script API'si</li>
+<li>Oyunu duraklat / sürdür, yüzen pencere</li>
+<li><b>Lua 5.3 alt kümesi</b> ve JavaScript ile GG tarzı <code>gg</code> script API'si</li>
 </ul></article>
 <article class="surface-card ml-card"><div class="eyebrow">DESTEKLENMEYENLER</div><h3>Bilerek yok</h3>
-<ul class="ml-feat"><li>Hız hilesi</li><li>Kendini gizleme ve anti-cheat atlatma</li><li>ASM yama / disassembler</li><li>Lua (yerine JavaScript script var, Lua scriptleri olduğu gibi çalışmaz)</li></ul></article>
+<ul class="ml-feat"><li>Hız hilesi</li><li>Kendini gizleme ve anti-cheat atlatma</li><li>ASM yama / disassembler</li><li>Tam Lua uyumu (64 bit tamsayı, goto, string.pack gibi kısımlar yok)</li></ul></article>
 <article class="surface-card ml-card"><div class="eyebrow">HAKKINDA</div><h3>ZYRON Memory Lab <span class="ml-ver">v2.0</span></h3>
 <p class="fine">Yalnızca çevrimdışı veya sahibi olduğun / test etmeye yetkili olduğun yazılımlarda kullan. Çevrimiçi oyunlarda hesabın banlanabilir ve değerler çoğunlukla sunucuda tutulur. Sistem ve korumalı uygulamalara bağlanılamaz.</p></article>
 </div>
@@ -169,6 +170,7 @@ Farklar: Lua yerine JavaScript. Bellek aralığı (from/to) ve limit parametrele
 </nav>
 </main>
 <div class="toast" id="toast" role="status"></div>
+<script src="./lua.js" defer></script>
 <script src="./memlab.js" defer></script>
 </body>
 </html>
