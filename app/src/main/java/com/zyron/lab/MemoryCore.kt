@@ -37,6 +37,43 @@ class MemoryCore private constructor(private val appContext: Context) {
     private var proc: Process? = null
     private var writer: BufferedWriter? = null
     private var reader: BufferedReader? = null
+    private var practice: Process? = null
+    /** "root" (su ile) veya "user" (rootsuz: yalnızca bu uygulamanın kendi kullanıcı alanı). */
+    @Volatile private var mode = "root"
+
+    private fun practicePath() = File(appContext.applicationInfo.nativeLibraryDir, "libpractice.so")
+
+    /** Rootsuz mod için pratik oyununu başlatır; {"ok":true,"pid":N} döner. */
+    fun startPractice(callback: (String) -> Unit) {
+        executor.execute {
+            val result = try {
+                if (!practicePath().exists()) {
+                    err("no_binary", "Pratik oyunu bu cihaz mimarisi için pakette yok.")
+                } else {
+                    if (!alive(practice)) {
+                        practice = ProcessBuilder(practicePath().absolutePath).redirectErrorStream(true).start()
+                    }
+                    val p = practice!!
+                    val line = BufferedReader(InputStreamReader(p.inputStream)).readLine() ?: ""
+                    val pid = line.removePrefix("pid=").trim().toIntOrNull()
+                    if (pid == null) err("start_failed", "Pratik oyunu başlatılamadı.")
+                    else {
+                        Thread { try { val b = ByteArray(256); while (p.inputStream.read(b) >= 0) { } } catch (e: Exception) { } }
+                            .apply { isDaemon = true }.start()
+                        JSONObject().put("ok", true).put("pid", pid).toString()
+                    }
+                }
+            } catch (e: Exception) {
+                err("start_failed", "Pratik oyunu başlatılamadı.")
+            }
+            callback(result)
+        }
+    }
+
+    fun stopPractice() {
+        try { practice?.destroy() } catch (e: Exception) { }
+        practice = null
+    }
 
     private fun corePath() = File(appContext.applicationInfo.nativeLibraryDir, "libmemcore.so")
 
@@ -74,8 +111,12 @@ class MemoryCore private constructor(private val appContext: Context) {
         JSONObject().put("ok", false).put("err", code).put("msg", msg).toString()
 
     /** Root iznini ister ve çekirdeği başlatır. */
-    fun checkRoot(callback: (String) -> Unit) {
+    fun checkRoot(callback: (String) -> Unit) = checkMode("root", callback)
+
+    /** Kipi seçer ("root" veya "user") ve çekirdeği o kipte (yeniden) başlatır. */
+    fun checkMode(newMode: String, callback: (String) -> Unit) {
         executor.execute {
+            if (newMode != mode) { stop(); mode = newMode }
             val result = try {
                 if (!corePath().exists()) {
                     err("no_binary", "Yerel çekirdek bu cihaz mimarisi için pakette yok.")
@@ -85,7 +126,8 @@ class MemoryCore private constructor(private val appContext: Context) {
                 }
             } catch (e: Exception) {
                 stop()
-                err("no_root", "Root izni alınamadı veya su bulunamadı.")
+                if (mode == "user") err("core_exited", "Çekirdek başlatılamadı.")
+                else err("no_root", "Root izni alınamadı veya su bulunamadı.")
             }
             callback(result)
         }
@@ -112,7 +154,14 @@ class MemoryCore private constructor(private val appContext: Context) {
         val parts = StringBuilder(corePath().absolutePath)
         if (SAFE_PATH.matches(data)) parts.append(" --data-dir ").append(data)
         if (SAFE_PATH.matches(tmp)) parts.append(" --tmp-dir ").append(tmp)
-        val started = ProcessBuilder("su", "-c", parts.toString()).start()
+        val started = if (mode == "user") {
+            val cmd = mutableListOf(corePath().absolutePath)
+            if (SAFE_PATH.matches(data)) { cmd.add("--data-dir"); cmd.add(data) }
+            if (SAFE_PATH.matches(tmp)) { cmd.add("--tmp-dir"); cmd.add(tmp) }
+            ProcessBuilder(cmd).start()
+        } else {
+            ProcessBuilder("su", "-c", parts.toString()).start()
+        }
         // stderr'i boşalt ki çekirdek bloke olmasın
         Thread {
             try {

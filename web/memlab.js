@@ -106,14 +106,42 @@
 
   // ---- 1) root ----
   function enableControls(on) { needsRoot().forEach(el => { el.disabled = !on; }); }
+  const MODE_KEY = 'zyron_ml_mode';
+  const getMode = () => { try { return localStorage.getItem(MODE_KEY) === 'user' ? 'user' : 'root'; } catch (_) { return 'root'; } };
+  function applyModeUi(m) {
+    $('ml-mode').value = m;
+    $('ml-root').firstChild.textContent = m === 'user' ? 'Rootsuz kipi başlat ' : "Root'u kontrol et ";
+    $('ml-practice').hidden = m !== 'user';
+    $('ml-mode-note').textContent = m === 'user'
+      ? "Rootsuz kip: Android, başka uygulamaların (oyunların) belleğine root olmadan erişimi engeller; bu kip yalnızca ZYRON'un kendi kullanıcı alanında çalışır. 'Pratik oyunu' ile aramayı, değiştirmeyi ve dondurmayı güvenle öğrenebilirsin."
+      : "Root'lu kip: telefonun root'lu olması gerekir; seçtiğin oyunun belleğini tarar ve değiştirir.";
+  }
+  $('ml-mode').addEventListener('change', () => {
+    const m = $('ml-mode').value === 'user' ? 'user' : 'root';
+    try { localStorage.setItem(MODE_KEY, m); } catch (_) {}
+    st.root = false; enableControls(false); step(1, false); resetAttach();
+    setStatus('Kip değişti · tekrar başlat'); applyModeUi(m);
+  });
+  applyModeUi(getMode());
   $('ml-root').addEventListener('click', async () => {
-    $('ml-root').disabled = true; setStatus('Root kontrol ediliyor…');
-    const r = await viaBridge(id => bridge.checkRoot(id));
+    const m = getMode();
+    $('ml-root').disabled = true; setStatus(m === 'user' ? 'Çekirdek başlatılıyor…' : 'Root kontrol ediliyor…');
+    const r = await viaBridge(id => typeof bridge.checkMode === 'function' ? bridge.checkMode(id, m) : bridge.checkRoot(id));
     $('ml-root').disabled = !bridge;
-    if (r.ok && r.euid === 0) {
-      st.root = true; setStatus('Root hazır · çekirdek çalışıyor', true); step(1, true); enableControls(true);
+    if (r.ok && (m === 'user' ? r.euid !== 0 : r.euid === 0)) {
+      st.root = true; setStatus((m === 'user' ? 'Rootsuz kip hazır' : 'Root hazır') + ' · çekirdek çalışıyor', true); step(1, true); enableControls(true);
       refreshProcs();
-    } else { st.root = false; setStatus(errText(r)); step(1, false); }
+    } else if (r.ok) { st.root = false; setStatus(m === 'user' ? 'Çekirdek root olarak çalışıyor; rootsuz kip için uygulamayı yeniden aç.' : errText({err:'no_root'})); step(1, false); }
+    else { st.root = false; setStatus(errText(r)); step(1, false); }
+  });
+  $('ml-practice').addEventListener('click', async () => {
+    if (!st.root) { toast('Önce rootsuz kipi başlat.'); return; }
+    const r = await viaBridge(id => bridge.startPractice(id));
+    if (!r.ok) { toast(r.msg || 'Pratik oyunu başlatılamadı.'); return; }
+    await refreshProcs();
+    const a = await call('attach ' + r.pid);
+    if (a.ok) { setAttached(a.pid, a.name || 'Pratik oyunu', a.ro, a.ptr); toast('Pratik oyunu bağlandı: altın 1000, can 100, mermi 30.'); }
+    else toast(errText(a));
   });
 
   // ---- 2) uygulama seçimi ----
@@ -959,8 +987,9 @@ end`
   // ---- başlangıç ----
   async function adopt() {
     if (!bridge || typeof bridge.isRunning !== 'function' || !bridge.isRunning()) return;
-    const s = await call('status'); if (!s.ok || s.euid !== 0) return;
-    st.root = true; setStatus('Root hazır · çekirdek çalışıyor', true); step(1, true); enableControls(true); syncMode();
+    const s = await call('status'); if (!s.ok) return;
+    applyModeUi(s.euid === 0 ? 'root' : 'user'); try { localStorage.setItem(MODE_KEY, s.euid === 0 ? 'root' : 'user'); } catch (_) {}
+    st.root = true; setStatus((s.euid === 0 ? 'Root hazır' : 'Rootsuz kip hazır') + ' · çekirdek çalışıyor', true); step(1, true); enableControls(true); syncMode();
     refreshProcs();
     if (s.pid > 0) {
       setAttached(s.pid, s.name || ('PID ' + s.pid), s.ro, s.ptr);

@@ -41,6 +41,18 @@ class MemoryBridge(
         core.checkRoot { json -> deliver(id, json) }
     }
 
+    /** mode: "root" veya "user" (rootsuz). Başka değer kabul edilmez. */
+    @JavascriptInterface
+    fun checkMode(id: Int, mode: String) {
+        if (mode != "root" && mode != "user") { deliver(id, err("bad_command", "Geçersiz kip.")); return }
+        core.checkMode(mode) { json -> deliver(id, json) }
+    }
+
+    @JavascriptInterface
+    fun startPractice(id: Int) {
+        core.startPractice { json -> deliver(id, json) }
+    }
+
     @JavascriptInterface
     fun send(id: Int, command: String) {
         val verb = command.substringBefore(' ')

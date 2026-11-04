@@ -16,8 +16,10 @@
 <div class="ml-warning ml-hide-overlay"><b>Önemli:</b> Sadece çevrimdışı / tek oyunculu ve sahibi olduğun ya da test etmeye yetkili olduğun yazılımlarda kullan. Çevrimiçi oyunlarda kullanma: hesabın banlanabilir. ZYRON anti-cheat korumalarını aşmaya veya kendini gizlemeye çalışmaz. Sistem ve korumalı uygulamalara bağlanılamaz.</div>
 
 <article class="surface-card ml-card" id="ml-step-1">
-<div class="eyebrow">BAĞLANTI</div><h3>Root ve hedef uygulama</h3>
-<div class="ml-line"><button class="btn-primary" id="ml-root" type="button">Root'u kontrol et <span>↗</span></button><span class="ml-status" id="ml-status" role="status">…</span></div>
+<div class="eyebrow">BAĞLANTI</div><h3>Kip ve hedef uygulama</h3>
+<div class="ml-line"><label class="cpm-label" for="ml-mode">KİP</label><select class="cpm-input" id="ml-mode"><option value="root">Root'lu (tüm uygulamalar)</option><option value="user">Rootsuz (pratik oyunu)</option></select></div>
+<p class="fine" id="ml-mode-note">Root'lu kip: telefonun root'lu olması gerekir; seçtiğin oyunun belleğini tarar ve değiştirir.</p>
+<div class="ml-line"><button class="btn-primary" id="ml-root" type="button">Root'u kontrol et <span>↗</span></button><button class="btn-ghost" id="ml-practice" type="button" hidden>🎮 Pratik oyununu başlat</button><span class="ml-status" id="ml-status" role="status">…</span></div>
 <div class="ml-line"><input class="cpm-input" id="ml-proc-q" placeholder="Uygulama ara (paket adı)" data-needs-root><button class="btn-ghost" id="ml-proc-refresh" type="button" data-needs-root>↻ Yenile</button></div>
 <div class="ml-procs" id="ml-procs"></div>
 <div class="ml-attached" id="ml-attached">Henüz uygulama seçilmedi.</div>

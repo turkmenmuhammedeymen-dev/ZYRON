@@ -1,5 +1,5 @@
 'use strict';
-const CACHE='zyron-shell-v9';
+const CACHE='zyron-shell-v10';
 const ASSETS=['./index.html','./styles.css','./lua.js','./memlab.js','./manifest.webmanifest','./icon.svg'];
 
 self.addEventListener('install',event=>{

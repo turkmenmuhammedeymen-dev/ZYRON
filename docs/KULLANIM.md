@@ -60,3 +60,7 @@ Bu kılavuz uygulamanın içinde de var: **Süreç** sekmesinde "📖 Kullanım 
 
 ## 8. Bilerek olmayanlar
 Hız hilesi, kendini gizleme / anti-cheat atlatma, ASM yama / disassembler yok. Lua kendi yazdığımız bir alt kümedir: 64 bit tamsayı (2^53 üstü), karmaşık `goto`, `string.pack`, `__eq`/`__gc` yok; sayılar `5.0` yerine `5` yazdırılır.
+
+## Rootsuz kip (Pratik oyunu)
+
+Bağlantı ekranındaki **Kip** menüsünden "Rootsuz" seçilir. Android, root olmadan bir uygulamanın başka uygulamanın (oyunun) belleğine erişmesine izin vermez; bu yüzden rootsuz kip gerçek oyunlarda çalışmaz. Çalıştığı yer ZYRON'un kendi kullanıcı alanıdır: **🎮 Pratik oyununu başlat** düğmesi altın (1000), can (100.0), mermi (30) ve hız değerleri olan sahte bir süreç açar. Arama, daraltma, değiştirme, dondurma ve Lua scriptlerini orada güvenle öğrenebilirsin. Gerçek oyunlar için root'lu kip gerekir.

@@ -26,6 +26,10 @@ build() {  # build <abi> <triple>
     -Wl,-z,max-page-size=16384 \
     -o "$out/libmemcore.so" "$HERE/memcore.c"
   echo "OK  $abi -> $out/libmemcore.so"
+  "$BIN/${tri}${API}-clang" -O2 -fPIE -pie -s -Wall \
+    -Wl,-z,max-page-size=16384 \
+    -o "$out/libpractice.so" "$HERE/practice.c"
+  echo "OK  $abi -> $out/libpractice.so"
 }
 
 build arm64-v8a   aarch64-linux-android
