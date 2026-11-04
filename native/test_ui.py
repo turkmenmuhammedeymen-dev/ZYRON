@@ -31,9 +31,11 @@ def mock(running):
 window.ZyronMem={info:()=>JSON.stringify({abi:'test',binary:true,sdk:35,dataDir:'%s'}),
  isRunning:()=>%s,
  openOverlay:()=>{window.__overlayOpened=true;},
+ checkMode:(id,m)=>{fetch('/send?cmd=status').then(r=>r.text()).then(t=>window.zyronMemResult(id,t));},
+ startPractice:id=>{window.zyronMemResult(id,JSON.stringify({ok:true,pid:%d}));},
  checkRoot:id=>{fetch('/send?cmd=status').then(r=>r.text()).then(t=>window.zyronMemResult(id,t));},
  send:(id,c)=>{fetch('/send?cmd='+encodeURIComponent(c)).then(r=>r.text()).then(t=>window.zyronMemResult(id,t));}};
-</script>""" % (DATA, "true" if running else "false")
+</script>""" % (DATA, "true" if running else "false", T_PID)
 
 COMMON = r"""
 const $ = id => document.getElementById(id), steps = [];
