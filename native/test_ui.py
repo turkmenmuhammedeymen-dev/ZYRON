@@ -225,9 +225,9 @@ window.addEventListener('load', async () => {
     ok('resume runs the target', await waitFor(async () => (await (await fetch('/state')).text()) !== 'T'));
 
     // --- script motoru ---
-    document.querySelector('[data-mltab=script]').click();
-    ok('templates are listed', $('ml-script-sel').options.length >= 6);
-    $('ml-script-sel').value = $('ml-script-sel').options[1].value; $('ml-script-sel').dispatchEvent(new Event('change'));
+    document.querySelector('[data-mltab=script]').click(); $('ml-script-lang').value = 'js';
+    ok('templates are listed', $('ml-script-sel').options.length >= 11);
+    $('ml-script-sel').value = [...$('ml-script-sel').options].find(x => x.value.startsWith('t:')).value; $('ml-script-sel').dispatchEvent(new Event('change'));
     ok('template fills the editor', $('ml-script-code').value.includes('gg.searchNumber'));
     $('ml-script-code').value = "await gg.searchNumber('1000', gg.TYPE_DWORD);\nprint('n=' + await gg.getResultsCount());\nawait gg.setValues([{address: " + Number(BigInt(decoy)) + ", flags: gg.TYPE_DWORD, value: 31337}]);\nprint('v=' + (await gg.getValues([{address: " + Number(BigInt(decoy)) + ", flags: gg.TYPE_DWORD}]))[0].value);";
     $('ml-script-run').click();
@@ -256,10 +256,36 @@ window.addEventListener('load', async () => {
     setv('ml-script-name', 'benim-scriptim'); $('ml-script-save').click();
     ok('script can be saved', [...$('ml-script-sel').options].some(o => o.textContent.includes('benim-scriptim')));
 
+    // --- Lua motoru (gercek cekirdekle) ---
+    const runLua = async code => { await waitFor(() => !$('ml-script-run').disabled); $('ml-script-clear').click(); $('ml-script-lang').value = 'lua'; $('ml-script-code').value = code; $('ml-script-run').click(); await waitFor(() => $('ml-script-out').textContent.includes('— bitti —') || $('ml-script-out').textContent.includes('HATA') || $('ml-script-out').textContent.includes('durduruldu')); await waitFor(() => !$('ml-script-run').disabled); return $('ml-script-out').textContent; };
+    document.querySelector('[data-mltab=script]').click();
+    ok('lua language option exists', [...$('ml-script-lang').options].some(o => o.value === 'lua'));
+    ok('lua templates are listed', [...$('ml-script-sel').options].filter(o => o.value.startsWith('l:')).length >= 5);
+    let o = await runLua("gg.searchNumber('31337', gg.TYPE_DWORD)\nprint('n=' .. gg.getResultsCount())\nlocal r = gg.getResults(5)\nfor i, v in ipairs(r) do print(string.format('0x%x', v.address), v.value, v.flags) end\ngg.setValues({{address = r[1].address, flags = gg.TYPE_DWORD, value = 777}})\nprint('v=' .. gg.getValues({{address = r[1].address, flags = 4}})[1].value)");
+    ok('lua search + getResults', /n=1\b/.test(o) && o.includes(ad.decoy.replace('0x', '0x')), o);
+    ok('lua numeric flags are GG-compatible (4 = dword)', /\t31337\t4/.test(o), o);
+    ok('lua setValues wrote the target', (await tg('get')).decoy === '777' && o.includes('v=777'), o);
+    o = await runLua("gg.searchNumber('777', gg.TYPE_DWORD)\nlocal r = gg.getResults(1)\ngg.setValues({{address = r[1].address, flags = gg.TYPE_DWORD, value = 31337}})\nprint(#r)");
+    ok('lua restore value', (await tg('get')).decoy === '31337', o);
+    o = await runLua("local t = {}\nfor i = 1, 5 do t[#t + 1] = i * i end\nprint(table.concat(t, ','), ('abc'):upper(), 10 // 3, 2^8)");
+    ok('lua pure computation', o.includes('1,4,9,16,25\tABC\t3\t256'), o);
+    o = await runLua("error('boom')");
+    ok('lua error reported with line', o.includes('HATA: script:1: boom'), o);
+    o = await runLua("local ok2, e2 = pcall(function() gg.setValues({{address = 1, flags = 4, value = 1}}) end)\nprint(ok2, type(e2))");
+    ok('lua host errors are catchable with pcall', o.includes('false\tstring') && !o.includes('HATA'), o);
+    $('ml-script-clear').click(); $('ml-script-lang').value = 'lua'; $('ml-script-code').value = 'while true do gg.sleep(50) end'; $('ml-script-run').click();
+    await sleep(300); $('ml-script-stop').click();
+    ok('lua script can be stopped', await waitFor(() => $('ml-script-out').textContent.includes('Script durduruldu')), $('ml-script-out').textContent);
+    await waitFor(() => !$('ml-script-run').disabled);
+    $('ml-script-sel').value = [...$('ml-script-sel').options].find(x => x.value.startsWith('l:')).value; $('ml-script-sel').dispatchEvent(new Event('change'));
+    ok('lua template loads and switches language', $('ml-script-lang').value === 'lua' && $('ml-script-code').value.includes('gg.'), $('ml-script-lang').value);
+    $('ml-script-lang').value = 'js';
+
     // oturumu sayfa 2 icin hazirla: decoy sonuclari acik, bagli kal
     document.querySelector('[data-mltab=search]').click();
     await idle(); setv('ml-smode', 'exact'); setv('ml-type', 'i32'); setv('ml-value', '31337'); $('ml-scan').click();
-    ok('leaves decoy result for page 2', await waitFor(() => hasRow(decoy)));
+    ok('leaves decoy result for page 2', await waitFor(() => hasRow(decoy) && rowOf(decoy).querySelector('.ml-val').value === '31337' && $('ml-count').textContent.includes('i32')), $('ml-count').textContent + ' | ' + JSON.stringify(await tg('get')) + ' | ' + rows().map(r => r.dataset.a + '=' + r.querySelector('.ml-val').value).join() + ' | ' + $('ml-p-search').className + ' ' + $('toast').textContent);
+    await idle();
   } catch (e) { ok('driver exception', false, e && e.stack || e); }
   done('1');
 });
@@ -274,7 +300,7 @@ window.addEventListener('load', async () => {
     ok('float button hidden in overlay', $('ml-float').hidden === true);
     ok('session adopted without asking for root', await waitFor(() => $('ml-status').classList.contains('ml-ok')), $('ml-status').textContent);
     ok('attached app adopted', await waitFor(() => $('ml-attached').textContent.includes('target')), $('ml-attached').textContent);
-    ok('previous results adopted', await waitFor(() => rows().some(r => r.dataset.a === ad.decoy && r.querySelector('.ml-val').value === '31337')), $('ml-count').textContent);
+    ok('previous results adopted', await waitFor(() => rows().some(r => r.dataset.a === ad.decoy && r.querySelector('.ml-val').value === '31337')), $('ml-count').textContent + ' | ' + await (await fetch('/send?cmd=status')).text() + ' | ' + rows().map(r => r.dataset.a + '=' + r.querySelector('.ml-val').value).join());
     ok('controls enabled', await idle());
     ok('saved badge renders in overlay', $('ml-saved-badge') !== null)
   } catch (e) { ok('driver exception', false, e && e.stack || e); }

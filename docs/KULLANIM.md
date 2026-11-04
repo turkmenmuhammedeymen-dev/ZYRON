@@ -37,7 +37,7 @@ Bu kılavuz uygulamanın içinde de var: **Süreç** sekmesinde "📖 Kullanım 
 - **Liste:** Sonuçlarda **＋** ile buraya ekle; adı değiştir, düzenle, dondur, dışa/içe aktar. Adresler oyun kapanana kadar geçerlidir.
 - **Bellek:** Adres yazıp hex olarak gör, bayta dokun (7 farklı türde okuma), bayt yaz, belleği dosyaya döker.
 - **Harita:** Bellek bölgeleri; birine dokununca Bellek sekmesinde açılır.
-- **Script:** GG'ye benzeyen JavaScript `gg` API'si. Şablonlardan başla; **Çalıştır / Durdur**.
+- **Script:** GG'nin `gg` API'si, **Lua** (5.3'ün büyük bir alt kümesi) veya JavaScript ile. Dili seç, şablondan başla; **Çalıştır / Durdur**. Örnek Lua: `gg.searchNumber('1000', gg.TYPE_DWORD)`, `gg.getResults(10)`, `gg.editAll('99999', gg.TYPE_DWORD)`.
 - **Ayarlar:** Listeyi/scriptleri sil, desteklenen ve desteklenmeyenler, hakkında.
 - Sonuçta **⋯**: Hex'te aç, işaretçi ara, işaretçiye git, listeden çıkar. Toplu yazma (en çok 2000) ve ofset kaydırma sonuçların altındadır.
 
@@ -59,4 +59,4 @@ Bu kılavuz uygulamanın içinde de var: **Süreç** sekmesinde "📖 Kullanım 
 | Yüzen pencere açılmıyor | "Diğer uygulamaların üzerinde göster" ve bildirim izinlerini kontrol et. |
 
 ## 8. Bilerek olmayanlar
-Hız hilesi, kendini gizleme / anti-cheat atlatma, ASM yama / disassembler yok. Lua yerine JavaScript script var (Lua scriptleri olduğu gibi çalışmaz).
+Hız hilesi, kendini gizleme / anti-cheat atlatma, ASM yama / disassembler yok. Lua kendi yazdığımız bir alt kümedir: 64 bit tamsayı (2^53 üstü), karmaşık `goto`, `string.pack`, `__eq`/`__gc` yok; sayılar `5.0` yerine `5` yazdırılır.

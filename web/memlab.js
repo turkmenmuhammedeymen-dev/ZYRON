@@ -647,8 +647,10 @@
   const REGION_NAME = {1:'cheap', 2:'jheap', 4:'calloc', 8:'cdata', 16:'cbss', 32:'anon', 64:'stack', 16384:'codeapp', 32768:'codesys', 65536:'java', 524288:'ashmem', 1048576:'video', 2097152:'other'};
   const SIGN = {EQUAL:'eq', NOT_EQUAL:'ne', GREATER:'gt', LESS:'lt', FUZZY_EQUAL:'unchanged', FUZZY_NOT_EQUAL:'changed', FUZZY_GREATER:'inc', FUZZY_LESS:'dec'};
   const gg = {
-    TYPE_AUTO:'auto', TYPE_BYTE:'i8', TYPE_WORD:'i16', TYPE_DWORD:'i32', TYPE_QWORD:'i64', TYPE_FLOAT:'f32', TYPE_DOUBLE:'f64', TYPE_XOR:'xor'
+    TYPE_AUTO:127, TYPE_BYTE:1, TYPE_WORD:2, TYPE_DWORD:4, TYPE_XOR:8, TYPE_FLOAT:16, TYPE_QWORD:32, TYPE_DOUBLE:64
   };
+  const TYPE_NUM = {auto:127, i8:1, i16:2, i32:4, xor:8, f32:16, i64:32, f64:64};
+  const NUM_TYPE = Object.fromEntries(Object.entries(TYPE_NUM).map(([k, v]) => [v, k]));
   Object.keys(REGION).forEach(k => { gg['REGION_' + k] = REGION[k]; });
   Object.keys(SIGN).forEach(k => { gg['SIGN_' + k] = SIGN[k]; });
   const core = async cmd => {
@@ -658,7 +660,7 @@
     if (!r.ok) throw new Error(errText(r));
     return r;
   };
-  const needType = t => { const v = t === undefined || t === null ? 'auto' : String(t); if (v !== 'auto' && !TYPES.includes(v)) throw new Error('Geçersiz tür: ' + t); return v; };
+  const needType = t => { const v = t === undefined || t === null ? 'auto' : (NUM_TYPE[t] || String(t)); if (v !== 'auto' && !TYPES.includes(v)) throw new Error('Geçersiz tür: ' + t); return v; };
   const addrStr = a => typeof a === 'string' ? (/^0x/i.test(a) ? a : '0x' + Number(a).toString(16)) : '0x' + Math.round(Number(a)).toString(16);
   const numOut = v => { const n = Number(v); return Number.isFinite(n) && String(n) === String(v).replace(/^\+/, '') ? n : v; };
   async function applyScriptRegions() {
@@ -709,7 +711,7 @@
       while (res.length < count) {
         const r = await core('list ' + (skip + res.length) + ' ' + Math.min(200, count - res.length));
         if (!r.items.length) break;
-        r.items.forEach(i => res.push({address: Number(BigInt(i.a)), value: numOut(i.v), flags: i.t}));
+        r.items.forEach(i => res.push({address: Number(BigInt(i.a)), value: numOut(i.v), flags: TYPE_NUM[i.t] || i.t}));
       }
       return res;
     },
@@ -733,7 +735,7 @@
       await refreshFrozen();
     },
     addListItems: async list => { (list || []).forEach(x => addSaved(addrStr(x.address), needType(x.flags || 'i32').replace('auto', 'i32'), true)); persistSaved(); renderSaved(); },
-    getListItems: async () => st.saved.map(s => ({address: Number(BigInt(s.addr)), flags: s.type, name: s.label})),
+    getListItems: async () => st.saved.map(s => ({address: Number(BigInt(s.addr)), flags: TYPE_NUM[s.type] || s.type, name: s.label})),
     removeListItems: async list => {
       const ad = new Set((list || []).map(x => addrStr(x.address).toLowerCase()));
       st.saved = st.saved.filter(s => !ad.has(s.addr.toLowerCase())); persistSaved(); renderSaved();
@@ -792,11 +794,48 @@ print(r.length, 'adres donduruldu');`,
 const v = await gg.getValues(l);
 v.forEach(x => print(x.name, '0x' + x.address.toString(16), x.flags, x.value));`
   };
+
+  const LUA_TEMPLATES = {
+    'Lua: tam değer bul ve değiştir': `-- Oyunda altın 1000 iken çalıştır.
+gg.setRanges(gg.REGION_C_HEAP | gg.REGION_C_ALLOC | gg.REGION_ANONYMOUS | gg.REGION_JAVA_HEAP | gg.REGION_C_BSS | gg.REGION_C_DATA)
+gg.searchNumber('1000', gg.TYPE_DWORD)
+print('Bulunan:', gg.getResultsCount())
+local r = gg.prompt({'Altın değişti. Yeni değer:'}, {''}, {'number'})
+if r == nil then return end
+gg.refineNumber(r[1], gg.TYPE_DWORD)
+print('Kalan:', gg.getResultsCount())
+print('Yazılan:', gg.editAll('99999', gg.TYPE_DWORD))`,
+    'Lua: grup arama': `-- Yan yana duran değerleri birlikte ara.
+gg.searchNumber('1234;5678;9000::128', gg.TYPE_DWORD)
+local r = gg.getResults(10)
+for i, v in ipairs(r) do
+  print(string.format('0x%x', v.address), v.value, v.flags)
+end`,
+    'Lua: bulanık arama': `-- Değeri bilmiyorsan: anlık görüntü, değişiklik, daralt.
+gg.searchFuzzy('0', gg.SIGN_FUZZY_EQUAL, gg.TYPE_DWORD)
+gg.alert('Oyunda değeri AZALT, sonra Tamam\'a bas.')
+gg.searchFuzzy('0', gg.SIGN_FUZZY_LESS, gg.TYPE_DWORD)
+print('Kalan:', gg.getResultsCount())`,
+    'Lua: sonuçları dondur': `local r = gg.getResults(5)
+for i, v in ipairs(r) do
+  v.value = 999
+  v.freeze = true
+end
+gg.setValues(r)
+print(#r, 'adres donduruldu')`,
+    'Lua: kayıtlı listeyi göster': `local l = gg.getListItems()
+local v = gg.getValues(l)
+for i, x in ipairs(v) do
+  print(x.name, string.format('0x%x', x.address), x.flags, x.value)
+end`
+  };
   const SCRIPT_KEY = 'zyron_ml_scripts_v1';
   let userScripts = store.get(SCRIPT_KEY, {});
   if (!userScripts || typeof userScripts !== 'object' || Array.isArray(userScripts)) userScripts = {};
+  Object.keys(userScripts).forEach(k => { if (typeof userScripts[k] === 'string') userScripts[k] = {c: userScripts[k], l: 'js'}; });
   function renderScriptSel(sel) {
     const opts = ['<option value="">— şablon / kayıtlı script seç —</option>']
+      .concat(Object.keys(LUA_TEMPLATES).map(k => '<option value="l:' + esc(k) + '">' + esc(k) + '</option>'))
       .concat(Object.keys(TEMPLATES).map(k => '<option value="t:' + esc(k) + '">' + esc(k) + '</option>'))
       .concat(Object.keys(userScripts).map(k => '<option value="u:' + esc(k) + '">★ ' + esc(k) + '</option>'));
     $('ml-script-sel').innerHTML = opts.join(''); if (sel) $('ml-script-sel').value = sel;
@@ -805,15 +844,16 @@ v.forEach(x => print(x.name, '0x' + x.address.toString(16), x.flags, x.value));`
   $('ml-script-sel').addEventListener('change', () => {
     const v = $('ml-script-sel').value; if (!v) return;
     const key = v.slice(2);
-    if (v[0] === 't') { $('ml-script-code').value = TEMPLATES[key]; $('ml-script-name').value = ''; }
-    else { $('ml-script-code').value = userScripts[key] || ''; $('ml-script-name').value = key; }
+    if (v[0] === 'l') { $('ml-script-lang').value = 'lua'; $('ml-script-code').value = LUA_TEMPLATES[key]; $('ml-script-name').value = ''; }
+    else if (v[0] === 't') { $('ml-script-lang').value = 'js'; $('ml-script-code').value = TEMPLATES[key]; $('ml-script-name').value = ''; }
+    else { const u = userScripts[key] || {c: '', l: 'js'}; $('ml-script-lang').value = u.l; $('ml-script-code').value = u.c; $('ml-script-name').value = key; }
   });
   $('ml-script-save').addEventListener('click', () => {
     const name = $('ml-script-name').value.trim();
     if (!name || name.length > 40) { toast('1–40 karakterlik bir ad yaz.'); return; }
     if (Object.keys(userScripts).length >= 50 && !(name in userScripts)) { toast('En fazla 50 script saklanır.'); return; }
     if ($('ml-script-code').value.length > 100000) { toast('Script çok uzun.'); return; }
-    userScripts[name] = $('ml-script-code').value; store.set(SCRIPT_KEY, userScripts); renderScriptSel('u:' + name); toast('Script kaydedildi.');
+    userScripts[name] = {c: $('ml-script-code').value, l: $('ml-script-lang').value}; store.set(SCRIPT_KEY, userScripts); renderScriptSel('u:' + name); toast('Script kaydedildi.');
   });
   $('ml-script-del').addEventListener('click', () => {
     const name = $('ml-script-name').value.trim();
@@ -822,7 +862,58 @@ v.forEach(x => print(x.name, '0x' + x.address.toString(16), x.flags, x.value));`
     delete userScripts[name]; store.set(SCRIPT_KEY, userScripts); renderScriptSel(); $('ml-script-name').value = ''; toast('Silindi.');
   });
   $('ml-script-clear').addEventListener('click', () => { $('ml-script-out').textContent = 'Konsol hazır.'; });
-  $('ml-script-stop').addEventListener('click', () => { st.scriptStop = true; out('— durdurma istendi —'); });
+  $('ml-script-stop').addEventListener('click', () => { st.scriptStop = true; if (st.lua) st.lua.stop(); out('— durdurma istendi —'); });
+
+  // ---- Lua köprüsü: gg.* çağrıları Lua'da senkron gibi görünür ----
+  function makeLua() {
+    if (!window.ZyronLua) throw new Error('Lua motoru yüklenemedi (lua.js).');
+    const Z = window.ZyronLua, lua = Z.create({print: out});
+    const conv = {
+      toJS: v => lua.toJS(v), toLua: v => lua.toLua(v)
+    };
+    const stopCheck = () => { if (st.scriptStop) throw new Z.LuaStop(); };
+    const wrap = (name, f) => async (...a) => {
+      stopCheck();
+      try { return [conv.toLua(await f(...a.map(conv.toJS)))]; }
+      catch (e) { if (e instanceof Z.LuaStop || e instanceof Z.LuaError) throw e; if (st.scriptStop || (e && e.message === 'Script durduruldu.')) throw new Z.LuaStop(); throw new Z.LuaError('gg.' + name + ': ' + (e && e.message ? e.message : e)); }
+    };
+    const G = Object.assign({}, gg);
+    // GG'ye özgü davranışlar
+    G.prompt = async (prompts, defaults, types) => {
+      if (typeof prompts === 'string') return window.prompt(prompts, defaults === undefined ? '' : String(defaults));
+      const out2 = {}; const list = Array.isArray(prompts) ? prompts : Object.values(prompts || {});
+      for (let i = 0; i < list.length; i++) {
+        const d = defaults && (Array.isArray(defaults) ? defaults[i] : Object.values(defaults)[i]);
+        const t = types && (Array.isArray(types) ? types[i] : Object.values(types)[i]);
+        if (t === 'checkbox') { out2[i + 1] = window.confirm(String(list[i])); continue; }
+        const a = window.prompt(String(list[i]), d === undefined ? '' : String(d)); if (a === null) return null;
+        out2[i + 1] = t === 'number' ? (Number.isFinite(Number(a)) && a.trim() !== '' ? Number(a) : '') : a;
+      }
+      const arr = []; for (let i = 1; i <= list.length; i++) arr.push(out2[i]); return arr;
+    };
+    G.alert = async (text, pos, neg) => { if (neg) return window.confirm(String(text)) ? 1 : 2; window.alert(String(text)); return 1; };
+    G.choice = async (items, _sel, m) => {
+      const arr = Array.isArray(items) ? items : Object.values(items || {});
+      const t = (m ? m + '\n' : '') + arr.map((x, i) => (i + 1) + ') ' + x).join('\n');
+      const a = window.prompt(t, '1'); const n = Number(a);
+      return a !== null && Number.isInteger(n) && n >= 1 && n <= arr.length ? n : null;
+    };
+    G.getTargetInfo = async () => ({label: st.name, packageName: st.name, pid: st.pid, ptrSize: st.ptr});
+    G.getFile = async () => 'script.lua'; G.getLine = async () => lua.S.line; G.getLocale = async () => 'tr'; G.isVisible = async () => true;
+    G.numberToLocale = async n => String(n);
+    G.bytes = async (text, enc) => Array.from(new TextEncoder().encode(String(text)));
+    G.saveVariable = async (v, path) => { store.set('zyron_gg_var_' + String(path).slice(-60), v === undefined ? null : v); return String(path); };
+    G.loadVariable = async path => store.get('zyron_gg_var_' + String(path).slice(-60), undefined);
+    G.gotoAddress = async a => { showTab('hex'); hexGo(addrStr(a)); };
+    G.VERSION = 'ZYRON 2.0'; G.BUILD = 20; G.EXT_STORAGE = (bridge && (() => { try { return JSON.parse(bridge.info()).dataDir || ''; } catch (_) { return ''; } })()) || '';
+    G.loadResults = async () => { throw new Error('loadResults desteklenmiyor.'); };
+    lua.bindObject('gg', G, wrap);
+    return lua;
+  }
+  async function runLua(code) {
+    const lua = makeLua(); st.lua = lua;
+    try { await lua.run(code, 'script'); } finally { st.lua = null; }
+  }
   async function runScript() {
     if (st.scriptRunning) return;
     if (st.busy) { toast('Önceki işlem sürüyor…'); return; }
@@ -831,12 +922,15 @@ v.forEach(x => print(x.name, '0x' + x.address.toString(16), x.flags, x.value));`
     st.scriptRunning = true; st.scriptStop = false; setBusy(true);
     $('ml-script-stop').disabled = false; $('ml-script-run').disabled = true; out('— çalışıyor —');
     try {
-      const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-      const fn = new AsyncFunction('gg', 'print', 'console', code);
-      const con = {log: out, warn: out, error: out, info: out};
-      await fn(gg, out, con);
+      if ($('ml-script-lang').value === 'lua') await runLua(code);
+      else {
+        const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+        const fn = new AsyncFunction('gg', 'print', 'console', code);
+        const con = {log: out, warn: out, error: out, info: out};
+        await fn(gg, out, con);
+      }
       out('— bitti —');
-    } catch (e) { out('HATA: ' + (e && e.message ? e.message : e)); }
+    } catch (e) { out(e && e.message === 'Script durduruldu.' || (e && e.constructor && e.constructor.name === 'LuaStop') ? 'Script durduruldu.' : 'HATA: ' + (e && e.message ? e.message : e)); }
     finally {
       st.scriptRunning = false; setBusy(false); $('ml-script-stop').disabled = true; $('ml-script-run').disabled = !st.root;
       if (st.pid) { refreshFrozen(); if (!st.fuzzy && st.total) loadPage(); }

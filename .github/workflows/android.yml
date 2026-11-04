@@ -14,7 +14,10 @@ jobs:
           test -s web/index.html
           test -s web/styles.css
           test -s web/memlab.js
+          test -s web/lua.js
           node --check web/memlab.js
+          node --check web/lua.js
+          node native/test_lua.js
       - uses: actions/upload-artifact@v4
         with:
           name: zyron-web
